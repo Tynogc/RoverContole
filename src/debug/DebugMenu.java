@@ -1,0 +1,126 @@
+package debug;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+import menu.AbstractMenu;
+import menu.Button;
+import menu.DataFiled;
+import menu.ScrollBar;
+
+public class DebugMenu extends AbstractMenu{
+	
+	private BufferedImage buffer;
+	private ScrollBar scb;
+	
+	private int atX;
+	private int atY;
+	private int sizeX;
+	private int sizeY;
+	private int debugsizeY;
+	
+	private boolean externalFrameIsVisible = false;
+	private Button externalFrame;
+	private DataFiled filePath;
+	
+	public DebugMenu(){
+		sizeX = Debug.sizeX+55;
+		sizeY = 200;
+		atX = 1000;
+		atY = userInterface.MainFrame.sizeY-sizeY-50;
+		debugsizeY = Debug.sizeY+15;
+		
+		
+		int scrollbarAmmount = Debug.sizeY/20;
+		int scrollbarSAize = sizeY/20;
+		
+		scb = new ScrollBar(atX+sizeX+10, atY, sizeY, scrollbarSAize, scrollbarAmmount);
+		add(scb);
+		externalFrame = new Button(atX,atY+sizeY,"res/win/gui/cli/G") {
+			
+			@Override
+			protected void uppdate() {
+			}
+			
+			@Override
+			protected void isFocused() {
+			}
+			
+			@Override
+			protected void isClicked() {
+				externalFrameIsVisible = ! externalFrameIsVisible;
+				debug.Debug.panel.setVisible(externalFrameIsVisible);
+				if(externalFrameIsVisible){
+					setText("Reduce External Frame");
+				}else{
+					setText("Show External Frame");
+				}
+			}
+		};
+		externalFrame.setText("Show External Frame");
+		externalFrame.setTextColor(Button.blue);
+		externalFrame.setBold(false);
+		add(externalFrame);
+		filePath = new DataFiled(atX+150,atY+sizeY,200,31,Color.black) {
+			@Override
+			protected void uppdate() {
+			}
+			@Override
+			protected void isClicked() {
+			}
+		};
+		add(filePath);
+		filePath.setTextColor(Color.white);
+		filePath.setText(Debug.logFilepath);
+		Button logRam = new Button(atX+350,atY+sizeY,"res/win/gui/cli/Gs") {
+			
+			@Override
+			protected void uppdate() {
+			}
+			@Override
+			protected void isFocused() {
+			}
+			@Override
+			protected void isClicked() {
+				Debug.knowMemory();
+				Debug.displayMemory(Debug.COM);
+			}
+		};
+		logRam.setBold(false);
+		logRam.setText("Log RAM");
+		add(logRam);
+		
+		buffer = new BufferedImage(sizeX, debugsizeY, BufferedImage.TYPE_INT_RGB);
+		Debug.menu = this;
+		paintDebug();
+		
+		
+	}
+	
+	public void paintDebug(){
+		Graphics g = buffer.getGraphics();
+		g.drawImage(Debug.i1, 0, Debug.sizeY-Debug.line*10, null);
+		g.drawImage(Debug.i2, 0, -Debug.line*10, null);
+		g.drawImage(Debug.i2, 0, Debug.sizeY*2-Debug.line*10, null);
+//		g.setColor(Color.black);
+//		g.fillRect(0, Debug.sizeY+10, Debug.sizeX, 20);
+//		g.setColor(Color.gray);
+//		g.drawRect(0, Debug.sizeY+10, Debug.sizeX, 20);
+		
+	}
+
+	@Override
+	protected void uppdateIntern() {
+		
+	}
+
+	@Override
+	protected void paintIntern(Graphics g) {
+		if(buffer != null){
+			int scroll = scb.getScrolled()*20;
+			g.drawImage(buffer.getSubimage(0, debugsizeY-sizeY-scroll, sizeX, sizeY), atX, atY, null);
+		}
+	}
+
+}
