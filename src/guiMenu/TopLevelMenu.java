@@ -90,7 +90,7 @@ public class TopLevelMenu extends AbstractMenu{
 		b3.setText("GPS");
 		
 		alarm = new AlarmkButton(540,20,"res/win/gui/spb/alb/") {
-			private boolean at;
+			//private boolean at;
 			@Override
 			protected void uppdate() {
 			}
@@ -105,27 +105,23 @@ public class TopLevelMenu extends AbstractMenu{
 		alarm.setText("Owerview");
 		add(alarm);
 		
-		shutDown = new Button(MainFrame.sizeX-100, 20, "res/win/gui/cli/001") {
+		shutDown = new Button(MainFrame.sizeX-50, 20, "res/win/gui/cli/001") {
 			
 			@Override
 			protected void uppdate() {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
-			protected void isFocused() {
-				// TODO Auto-generated method stub
-				
-			}
+			protected void isFocused() {}
 			
 			@Override
 			protected void isClicked() {
+				//TODO schliessen abfragen
 				System.exit(0);
 			}
 		};
 		add(shutDown);
-		time = new DataFiled(700,10,130, 20, Color.white) {
+		time = new DataFiled(700,10,180, 20, Color.white) {
 			@Override
 			protected void isClicked() {
 			}
@@ -134,7 +130,7 @@ public class TopLevelMenu extends AbstractMenu{
 			}
 		};
 		add(time);
-		timeMission = new DataFiled(700,35,130, 20, Color.white) {
+		timeMission = new DataFiled(700,35,180, 20, Color.white) {
 			@Override
 			protected void isClicked() {
 			}
@@ -144,7 +140,7 @@ public class TopLevelMenu extends AbstractMenu{
 		};
 		add(timeMission);
 		
-		RAMfree = new DataFiled(850,10,130, 20, Color.blue) {
+		RAMfree = new DataFiled(900,10,130, 20, Color.blue) {
 			@Override
 			protected void isClicked() {
 			}
@@ -153,7 +149,7 @@ public class TopLevelMenu extends AbstractMenu{
 			}
 		};
 		add(RAMfree);
-		RAMtotal = new DataFiled(850,35,130, 20, Color.blue) {
+		RAMtotal = new DataFiled(900,35,130, 20, Color.blue) {
 			@Override
 			protected void isClicked() {
 			}
@@ -162,7 +158,7 @@ public class TopLevelMenu extends AbstractMenu{
 			}
 		};
 		add(RAMtotal);
-		RAMmax = new DataFiled(990,35,130, 20, Color.blue) {
+		RAMmax = new DataFiled(1045,35,130, 20, Color.blue) {
 			@Override
 			protected void isClicked() {
 			}
@@ -172,7 +168,7 @@ public class TopLevelMenu extends AbstractMenu{
 		};
 		add(RAMmax);
 		
-		Button gc = new Button(990,10,"res/win/gui/cli/Gsk") {
+		Button gc = new Button(1045,10,"res/win/gui/cli/Gsk") {
 			@Override
 			protected void uppdate() {
 			}

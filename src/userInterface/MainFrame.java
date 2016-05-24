@@ -139,7 +139,7 @@ public class MainFrame extends Panel{
 		debug.Debug.panel.setVisible(false);
 	}
 	
-	public void loop(int fps, int secFps, int thiFps){
+	public void loop(int fps, int secFps, int thiFps, int triFps){
 		BufferedImage b = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = b.getGraphics();
 		g.setColor(Color.black);
@@ -173,9 +173,15 @@ public class MainFrame extends Panel{
 			gui.mouseYAdd = offY;
 		}
 		
-		g.setColor(Color.red);
-		g.drawString("FPS: "+fps+" - "+secFps, 10, 14);
-		g.drawString("T: "+thiFps, 10, 30);
+		g.setColor(Color.green);
+		g.setFont(menu.Button.plainFont);
+		g.drawString("FPS: "+fps, 1200, 14);
+		g.drawString("T: ["+thiFps+"] ["+triFps+"]", 1200, 30);
+		if(secFps<0)g.setColor(Color.red);
+		secFps = -secFps+50;
+		double fpsDpe = (double)secFps/50.0;
+		secFps = (int)(fpsDpe*100.0);
+		g.drawString("Load:"+secFps/100+""+(secFps/10)%10+""+secFps%10+"%", 1250, 14);
 		
 		buffer = b;
 		paint(getGraphics());

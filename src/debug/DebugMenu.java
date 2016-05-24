@@ -25,7 +25,7 @@ public class DebugMenu extends AbstractMenu{
 	private DataFiled filePath;
 	
 	public DebugMenu(){
-		sizeX = Debug.sizeX+155;
+		sizeX = Debug.sizeX+75;
 		sizeY = 200;
 		atX = 1000;
 		atY = userInterface.MainFrame.sizeY-sizeY-50;
@@ -35,7 +35,7 @@ public class DebugMenu extends AbstractMenu{
 		int scrollbarAmmount = Debug.sizeY/20;
 		int scrollbarSAize = sizeY/20;
 		
-		scb = new ScrollBar(atX+sizeX+10, atY, sizeY, scrollbarSAize, scrollbarAmmount);
+		scb = new ScrollBar(atX+sizeX, atY, sizeY, scrollbarSAize, scrollbarAmmount);
 		add(scb);
 		externalFrame = new Button(atX,atY+sizeY,"res/win/gui/cli/G") {
 			
