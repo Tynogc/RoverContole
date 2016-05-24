@@ -231,7 +231,7 @@ public class SideMenu extends AbstractMenu {
 		g.drawImage(buffAlt, MainFrame.sizeX-330, 220, null);
 		
 		g.drawImage(energy, MainFrame.sizeX-330, 500, null);
-		g.drawImage(gpsStatus, MainFrame.sizeX-330, 0, null);
+		g.drawImage(gpsStatus, MainFrame.sizeX-330, 300, null);
 	}
 	
 	private BufferedImage generatColoredBuffer(ImageIcon ima, int i){

@@ -124,3 +124,8 @@ res/win/nav/sym/1/Revers.png
 res/win/nav/sym/1/Revers.png
 res/win/nav/sym/1/Tetta.png
 res/win/nav/sym/1/Tetta.png
+res/win/gui/cli/001n.png
+res/win/gui/cli/001c.png
+res/win/gui/cli/001f.png
+res/win/gui/cli/001d.png
+res/win/gui/cli/001d.png

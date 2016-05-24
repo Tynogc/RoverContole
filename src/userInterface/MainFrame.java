@@ -5,7 +5,10 @@ import guiMenu.SettingsMenu;
 import guiMenu.WarnMenu;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Panel;
 import java.awt.image.BufferedImage;
 
@@ -44,9 +47,13 @@ public class MainFrame extends Panel{
 	
 	public static boolean hideDebugFrame = true;
 	public static boolean standartStartUp = true;
+	public static boolean fullScreen = true;
 	public static byte playIntro = 0; //0: Play, 1: Play Simple ELSE: dont play
 	
 	private boolean startUpBoolean;
+	
+	private static GraphicsDevice device = 
+			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 	
 	public MainFrame(){
 		super();
@@ -59,6 +66,14 @@ public class MainFrame extends Panel{
 		//StartUp
 		StartUp startUp = new StartUp(f);
 		startUp.doStartUp();
+		
+		Dimension dim = getToolkit().getScreenSize();
+		int per = 60;
+		int qPer = 15;
+		frameX = dim.width-qPer;
+		frameY = dim.height-per;
+		if(frameX > sizeX)frameX = sizeX;
+		if(frameY > sizeY)frameY = sizeY;
 		
 		frame = new JFrame();
 		frame.setBounds(10,10, frameX+10, frameY);
@@ -89,6 +104,9 @@ public class MainFrame extends Panel{
 			frame.setVisible(true);
 			debug.Debug.bootMsg("Frame Open", 0);
 			debug.Debug.panel.setVisible(!hideDebugFrame);
+			if(fullScreen){
+				device.setFullScreenWindow(frame);
+			}
 		}
 		
 		GuiControle.warnMenu = new guiMenu.WarnMenu();
@@ -113,6 +131,9 @@ public class MainFrame extends Panel{
 			
 			frame.setVisible(true);
 			debug.Debug.bootMsg("Frame Open", 0);
+			if(fullScreen){
+				device.setFullScreenWindow(frame);
+			}
 		}
 		
 		debug.Debug.panel.setVisible(false);

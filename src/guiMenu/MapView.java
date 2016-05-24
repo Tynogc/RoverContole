@@ -378,6 +378,8 @@ public class MapView extends menu.AbstractMenu{
 	}
 	
 	private void paintCircOrient(int mapOrientation, boolean all, Graphics g, int x, int y){
+		Graphics2D g2d = (Graphics2D)g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setFont(font);
 		g.setColor(Color.white);
 		asSpace(all, mapOrientation, "N", g, -4+x,5+y);

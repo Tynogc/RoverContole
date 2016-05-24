@@ -5,7 +5,7 @@ public class WayInformation {
 	public static final double ERR = Double.NEGATIVE_INFINITY;
 	
 	public double prograde(){
-		return ERR;
+		return 89;
 	}
 	
 	public double via(){

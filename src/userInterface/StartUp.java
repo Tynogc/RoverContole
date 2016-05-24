@@ -18,10 +18,11 @@ public class StartUp {
 		gtt();
 		debug.Debug.showExtendedBootInfo = advancedInfo;
 		MainFrame.standartStartUp = standartStartUp;
-		if(fullScreen){
-			MainFrame.frameX = MainFrame.sizeX;
-			MainFrame.frameY = MainFrame.sizeY;
-		}
+//		if(fullScreen){
+//			MainFrame.frameX = MainFrame.sizeX;
+//			MainFrame.frameY = MainFrame.sizeY;
+//		}
+		MainFrame.fullScreen = fullScreen;
 		if(playIntro){
 			MainFrame.playIntro = 0;
 		}else if(playIntroSimple){

@@ -1,5 +1,7 @@
 package debug;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -24,6 +26,10 @@ public class DebugFrame extends JFrame{
 	public static int dfl = -280;
 	
 	public DebugFrame(){
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		dfl = dim.height-(Debug.sizeY+100);
+		if(dfl>0)dfl = 0;
+		
 		setBounds(100,0,Debug.sizeX+110,Debug.sizeY+80+dfl);
 		panel = new DebPanel(this);
 		add(panel);

@@ -22,6 +22,8 @@ public class TopLevelMenu extends AbstractMenu{
 	private DataFiled RAMtotal;
 	private DataFiled RAMmax;
 	
+	private Button shutDown;
+	
 	private Runtime runtime;
 	
 	private long missionTime;
@@ -103,6 +105,26 @@ public class TopLevelMenu extends AbstractMenu{
 		alarm.setText("Owerview");
 		add(alarm);
 		
+		shutDown = new Button(MainFrame.sizeX-100, 20, "res/win/gui/cli/001") {
+			
+			@Override
+			protected void uppdate() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			protected void isFocused() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			protected void isClicked() {
+				System.exit(0);
+			}
+		};
+		add(shutDown);
 		time = new DataFiled(700,10,130, 20, Color.white) {
 			@Override
 			protected void isClicked() {
