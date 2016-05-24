@@ -25,7 +25,7 @@ public class DebugMenu extends AbstractMenu{
 	private DataFiled filePath;
 	
 	public DebugMenu(){
-		sizeX = Debug.sizeX+55;
+		sizeX = Debug.sizeX+155;
 		sizeY = 200;
 		atX = 1000;
 		atY = userInterface.MainFrame.sizeY-sizeY-50;

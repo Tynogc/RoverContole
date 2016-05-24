@@ -5,7 +5,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -56,11 +58,48 @@ public abstract class Button implements ButtonInterface {
 	protected boolean bold = false;
 	protected boolean big = false;
 	
+	public static Font plainFont;
+	public static Font boldFont12;
+	public static Font boldFont14;
+	
 	public Button(int x, int y, int wi, int hi){
 		xPos = x;
 		yPos = y;
 		xSize = wi;
 		ySize = hi;
+		
+		if(plainFont == null){
+			try
+	        {
+	            plainFont = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeSerif.ttf"));
+	            plainFont = plainFont.deriveFont(14f);
+	        }
+	        catch(Exception e)
+	        {
+	        	plainFont = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
+	        	e.printStackTrace();
+	        }
+			try
+	        {
+	            boldFont12 = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeSerifBold.ttf"));
+	            boldFont12 = boldFont12.deriveFont(12f);
+	        }
+	        catch(Exception e)
+	        {
+	        	boldFont12 = new Font(Font.SANS_SERIF, Font.BOLD, 12);
+	        	e.printStackTrace();
+	        }
+			try
+	        {
+				boldFont14 = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeSerifBold.ttf"));
+				boldFont14 = boldFont14.deriveFont(14f);
+	        }
+	        catch(Exception e)
+	        {
+	        	boldFont14 = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+	        	e.printStackTrace();
+	        }
+		}
 		
 		setBold(true);
 		setBig(true);
@@ -274,6 +313,8 @@ public abstract class Button implements ButtonInterface {
 	}
 	
 	public void paintYou(Graphics g){
+		Graphics2D g2d = (Graphics2D)g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		if(!visible){
 			next.paintYou(g);
 			return;

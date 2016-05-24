@@ -7,6 +7,9 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.RenderingHints.Key;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.swing.JLabel;
 
 import process.ProcessControl;
 import process.WayInformation;
@@ -59,9 +62,22 @@ public class MapView extends menu.AbstractMenu{
 	
 	public MapView(){
 		//debug.Debug.println("Preparing map...");
-		font = new Font(Font.MONOSPACED, Font.PLAIN, 18);
-		fontT = new Font(Font.MONOSPACED, Font.PLAIN, 15);
-		fontS = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+		try
+        {
+            font = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeMono.ttf"));
+            font = font.deriveFont(18f);
+            fontT = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeMono.ttf"));
+            fontT = fontT.deriveFont(15f);
+            fontS = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeMono.ttf"));
+            fontS = fontS.deriveFont(12f);
+        }
+        catch(Exception e)
+        {
+        	font = new Font(Font.MONOSPACED, Font.PLAIN, 18);
+    		fontT = new Font(Font.MONOSPACED, Font.PLAIN, 15);
+    		fontS = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+            e.printStackTrace();
+        }
 		
 		points = new BufferedImage[7];
 		points[0] = PicLoader.pic.getImage(dir+"Prograde.png");
@@ -292,13 +308,16 @@ public class MapView extends menu.AbstractMenu{
 		double via = ProcessControl.way.via();
 		double target = ProcessControl.way.target();
 		
-		String s = eecDouble(rovOri)+"°";
+		Graphics2D g2d = (Graphics2D)g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		
+		String s = eecDouble(rovOri)+"Â°";
 		g.setFont(fontT);
 		g.setColor(dirColor);
 		g.drawString(s, x+bufferSize/2-13, y-20);
 		
-		s = eecDouble(prograde)+"°";
-		if(prograde == WayInformation.ERR) s = "---°";
+		s = eecDouble(prograde)+"Â°";
+		if(prograde == WayInformation.ERR) s = "---Â°";
 		g.setColor(progColor);
 		g.drawString("PROG:"+s, x, y-20);
 		
@@ -313,7 +332,7 @@ public class MapView extends menu.AbstractMenu{
 		if(prograde == WayInformation.ERR) s = "---";
 		g.drawString("TURN:"+s, x, y-10);
 		
-		s = eecDouble(direction)+"°";
+		s = eecDouble(direction)+"Â°";
 		g.setColor(dirColor);
 		g.drawString("DIR: "+s, x+bufferSize-70, y-20);
 		
@@ -327,9 +346,9 @@ public class MapView extends menu.AbstractMenu{
 		s = eecDouble(q)+r;
 		g.drawString("TURN:"+s, x+bufferSize-70, y-10);
 		
-		s = eecDouble(via)+"°";
+		s = eecDouble(via)+"Â°";
 		g.setColor(viaColor);
-		if(via == WayInformation.ERR) s ="---°";
+		if(via == WayInformation.ERR) s ="---Â°";
 		g.drawString("VIA: "+s, x+bufferSize-70, y+5);
 		
 		q = (int)(via-rovOri);
@@ -343,14 +362,14 @@ public class MapView extends menu.AbstractMenu{
 		if(via == WayInformation.ERR) s ="---";
 		g.drawString("TURN:"+s, x+bufferSize-70, y+15);
 		
-		s = eecDouble(correct)+"°";
-		if(correct == WayInformation.ERR) s = "---°";
+		s = eecDouble(correct)+"Â°";
+		if(correct == WayInformation.ERR) s = "---Â°";
 		g.setColor(corrColor);
 		g.drawString("CORR:"+s, x, y+5);
 		
-		s = eecDouble(target)+"°";
+		s = eecDouble(target)+"Â°";
 		g.setColor(targetColor);
-		if(target == WayInformation.ERR) s ="---°";
+		if(target == WayInformation.ERR) s ="---Â°";
 		g.drawString("DIR: "+s, x, y+15);
 	}
 	

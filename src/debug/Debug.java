@@ -3,8 +3,11 @@ package debug;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -92,8 +95,29 @@ public class Debug {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, sizeX+200, sizeY);
 		
-		font2 = new JLabel().getFont();
-		font = new Font(Font.MONOSPACED, Font.BOLD, 14);
+		try
+        {
+            font = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeMono.ttf"));
+            font = font.deriveFont(16f);
+        }
+        catch(Exception e)
+        {
+    		font = new Font(Font.MONOSPACED, Font.BOLD, 14);
+            e.printStackTrace();
+        }
+		try
+        {
+            font2 = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/FreeSans.ttf"));
+            font2 = font2.deriveFont(14f);
+        }
+        catch(Exception e)
+        {
+        	font2 = new JLabel().getFont();
+            e.printStackTrace();
+        }
+		
+		//font = new Font(Font.MONOSPACED, Font.BOLD, 14);
+		//font2 = font;
 		
 		PrintWriter writer = null; 
 		try { 
@@ -108,8 +132,9 @@ public class Debug {
 				writer.flush(); 
 				writer.close(); 
 			} 
-		} 
+		}
 	}
+	
 	public static void print(String s, int color){
 		try {
 			sema.acquire();
@@ -130,18 +155,23 @@ public class Debug {
 		Graphics g1 = i1.getGraphics();
 		Graphics g2 = i2.getGraphics();
 		
-		g1.setColor(getCol(color));
-		g2.setColor(getCol(color));
+		Graphics2D g2d1 = (Graphics2D)g1;
+		g2d1.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		Graphics2D g2d2 = (Graphics2D)g2;
+		g2d2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		
-		g1.setFont(font);
-		g2.setFont(font);
+		g2d1.setColor(getCol(color));
+		g2d2.setColor(getCol(color));
+		
+		g2d1.setFont(font);
+		g2d2.setFont(font);
 		for (int i = 0; i < s.length(); i++) {
 			String abc = "";
 			abc += s.charAt(i);
 			if(line>(sizeY/10)-1){
-				g2.drawString(abc, letter*textWidth, 10*line+10-sizeY);
+				g2d2.drawString(abc, letter*textWidth, 10*line+10-sizeY);
 			}else{
-				g1.drawString(abc, letter*textWidth, 10*line+10);
+				g2d1.drawString(abc, letter*textWidth, 10*line+10);
 			}
 			letter++;
 			checkLetter();
@@ -332,12 +362,14 @@ public class Debug {
 		time = System.currentTimeMillis();
 		String date = new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date (time));
 		if(line>(sizeY/10)-1){
-			Graphics g = i2.getGraphics();
+			Graphics2D g = (Graphics2D)i2.getGraphics();
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(font2);
 			g.setColor(Color.white);
 			g.drawString("["+date+"]", sizeX, 10*line-sizeY+10);
 		}else{
-			Graphics g = i1.getGraphics();
+			Graphics2D g = (Graphics2D)i1.getGraphics();
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(font2);
 			g.setColor(Color.white);
 			g.drawString("["+date+"]", sizeX, 10*line+10);
@@ -360,12 +392,14 @@ public class Debug {
 	
 	private static void doTimProg(){
 		if(line>(sizeY/10)-1){
-			Graphics g = i2.getGraphics();
+			Graphics2D g = (Graphics2D)i2.getGraphics();
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(font2);
 			g.setColor(Color.white);
 			g.drawString("[ +"+(System.currentTimeMillis()-time)+"]", sizeX, 10*line-sizeY+10);
 		}else{
-			Graphics g = i1.getGraphics();
+			Graphics2D g = (Graphics2D)i1.getGraphics();
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(font2);
 			g.setColor(Color.white);
 			g.drawString("[ +"+(System.currentTimeMillis()-time)+"]", sizeX, 10*line+10);
