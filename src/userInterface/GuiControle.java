@@ -14,7 +14,7 @@ public class GuiControle {
 	
 	private menu.MenuControle firstM;
 	private static menu.MenuControle secondM;
-	private menu.MenuControle sideMenu;
+	private static menu.MenuControle sideMenu;
 	private menu.MenuControle bottMenu;
 	private menu.MenuControle logMenu;
 	
@@ -34,6 +34,7 @@ public class GuiControle {
 	public static guiMenu.MapView mapMenu;
 	
 	private static guiMenu.SideMenu sideM;
+	private static guiMenu.PerformanceMenu sideM2;
 	
 	public GuiControle(MouseListener m, KeySystem key, debug.DebugMenu dbm){
 		debug.Debug.println("Starting to make GUI-Areas...");
@@ -61,6 +62,10 @@ public class GuiControle {
 		sideMenu.setActivMenu(sideM);
 		debug.Debug.bootMsg("SideMenu", sideM.getStatus());
 		
+		sideM2 = new PerformanceMenu();
+		//sideMenu.setActivMenu(sideM);
+		debug.Debug.bootMsg("Perdormance", sideM2.getStatus());
+		
 		if(warnMenu == null)
 		warnMenu = new WarnMenu();
 		warnMenu.setAlb(tlm.getAlb());
@@ -72,7 +77,7 @@ public class GuiControle {
 		codeMenu = new CodeMenu(key);
 		debug.Debug.bootMsg("Coding", codeMenu.getStatus());
 		
-		comMenu = new guiMenu.ComunicationMenu();
+		comMenu = new guiMenu.ComunicationMenu(key);
 		debug.Debug.bootMsg("ComMenu", comMenu.getStatus());
 		
 		mapMenu = new guiMenu.MapView();
@@ -114,6 +119,15 @@ public class GuiControle {
 		sideMenu.paintYou(g);
 		bottMenu.paintYou(g);
 		logMenu.paintYou(g);
+	}
+	
+	public static void sideMenuNormal(boolean b){
+		if(sideMenu == null)return;
+		if(b){
+			sideMenu.setActivMenu(sideM);
+		}else{
+			sideMenu.setActivMenu(sideM2);
+		}
 	}
 
 }

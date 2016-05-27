@@ -12,10 +12,9 @@ import javax.naming.CommunicationException;
 import javax.swing.ImageIcon;
 
 import debug.Debug;
-
+import userInterface.KeySystem;
 import userInterface.MainFrame;
 import userInterface.MainThread;
-
 import menu.AbstractMenu;
 import menu.Button;
 import menu.DataFiled;
@@ -66,8 +65,10 @@ public class ComunicationMenu extends AbstractMenu{
 	private ImageIcon[] ima;
 	
 	private String filePath;
+	
+	private comunication.ConnectionChange changeCon;
 
-	public ComunicationMenu(){
+	public ComunicationMenu(KeySystem k){
 		filePath = "log/com/"+
 				new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm").format(new java.util.Date (System.currentTimeMillis()));
 		
@@ -328,6 +329,13 @@ public class ComunicationMenu extends AbstractMenu{
 		};
 		add(reconect);
 		
+		changeCon = new comunication.ConnectionChange(600, 300, k);
+		add(changeCon.save);
+		add(changeCon.ip);
+		add(changeCon.ipText);
+		add(changeCon.port);
+		add(changeCon.portText);
+		
 		setUpLink(new String[]{
 				"***GPS***C124.234_L1254.43_H340_S10",
 				"***TRM***F12_F12_F02_F02_K:L",
@@ -367,6 +375,7 @@ public class ComunicationMenu extends AbstractMenu{
 			commBuff = paintADataArray(commands, commScro.getScrolled());
 			commPos = commScro.getScrolled();
 		}
+		changeCon.uppdate();
 	}
 
 	@Override

@@ -202,7 +202,7 @@ public class Debug {
 		try { 
 			writer = new PrintWriter(new FileWriter(logFilepath, true),true);
 			
-			writer.println("[cont    ]  "+theLineBefor);
+			writer.println("[cont    ][  ]"+theLineBefor);
 			theLineBefor = "";
 			
 		} catch (IOException ioe) { 
@@ -229,9 +229,11 @@ public class Debug {
 			doTimProg();
 		}
 		
+		String kse = getPreString(color);
+		
 		try { 
 			writer = new PrintWriter(new FileWriter(logFilepath, true),true);
-			writer.println(s);
+			writer.println(kse+" "+s);
 		} catch (IOException ioe) { 
 			ioe.printStackTrace(); 
 		} finally { 
@@ -358,6 +360,26 @@ public class Debug {
 		return Color.darkGray;
 	}
 	
+	private static String getPreString(int i){
+		switch(i){
+		case ERROR: return "[ER]";
+		case SUBERR: return "[SE]";
+		
+		case COM: return "[co]";
+		case SUBCOM: return "[sc]";
+		case COMERR: return "[CE]";
+		case PRICOM: return "[cp]";
+		
+		case WARN: return "[WA]";
+		case SUBWARN: return "[SW]";
+		
+		case MASSAGE: return "[--]";
+		
+		case TEXT: return "[--]";
+		}
+		return "[??]";
+	}
+	
 	private static void doTimeStamp(){
 		time = System.currentTimeMillis();
 		String date = new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date (time));
@@ -378,7 +400,7 @@ public class Debug {
 		PrintWriter writer = null; 
 		try { 
 			writer = new PrintWriter(new FileWriter(logFilepath, true),true); 
-			writer.print("["+date+"]  ");
+			writer.print("["+date+"]");
 		} catch (IOException ioe) { 
 			ioe.printStackTrace();
 		} finally { 
@@ -411,7 +433,7 @@ public class Debug {
 		PrintWriter writer = null; 
 		try { 
 			writer = new PrintWriter(new FileWriter(logFilepath, true),true); 
-			writer.print(s+"]  ");
+			writer.print(s+"]");
 		} catch (IOException ioe) { 
 			ioe.printStackTrace(); 
 		} finally { 

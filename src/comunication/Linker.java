@@ -12,8 +12,8 @@ import java.util.concurrent.Semaphore;
 
 public class Linker extends Thread{
 	
-	public static String ip = "localhost";
-	public static int port = 3141;
+	public String ip;
+	public int port;
 	
 	private Semaphore sema;
 	
@@ -30,6 +30,8 @@ public class Linker extends Thread{
 	private Scanner sc;
 	
 	public Linker(){
+		ip = ConnectionChange.getIp();
+		port = ConnectionChange.getPort();
 		conectionAquiered = false;
 		sema = new Semaphore(1);
 		try {

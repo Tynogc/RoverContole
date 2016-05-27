@@ -14,7 +14,7 @@ public class WarnMenu extends menu.AbstractMenu{
 	private boolean[] quitB;
 	private String[] textB;
 	
-	private Button[] quit;
+	//private Button[] quit;
 	private DataFiled[] state;
 	private DataFiled[] externState;
 	
@@ -25,6 +25,7 @@ public class WarnMenu extends menu.AbstractMenu{
 	
 	private static final Color normalCol = new Color(70,70,240);
 	private static final Color warnCol = new Color(250,220,40);
+	private static final Color warnColB = new Color(150,150,0);
 	private static final Color alarmCol = new Color(255,30,40);
 	
 	public static final int TYPE_SYSTEM = 0;
@@ -33,6 +34,8 @@ public class WarnMenu extends menu.AbstractMenu{
 	public static WarnMenu warn = null;
 	
 	private AlarmkButton alarmButton;
+	
+	private boolean blinkState = true;
 	
 	public WarnMenu(){
 		alarmButton = null;
@@ -43,63 +46,80 @@ public class WarnMenu extends menu.AbstractMenu{
 		
 		textB = new String[length];
 		
-		quit = new Button[length];
+		//quit = new Button[length];
 		state  = new DataFiled[length];
 		externState  = new DataFiled[length];
 		
-		quit[0] = new Button(400,100,"res/win/gui/cli/Gsk") {
-			private final int q = TYPE_SYSTEM;
-			@Override
-			protected void uppdate() {}
-			@Override
-			protected void isFocused() {}
-			@Override
-			protected void isClicked() {
-				quitB[q] = true;
-				uppdateAlarmState();
-			}
-		};
-		quit[1] = new Button(400,100,"res/win/gui/cli/Gsk") {
-			private final int q = TYPE_CONNECTION;
-			@Override
-			protected void uppdate() {}
-			@Override
-			protected void isFocused() {}
-			@Override
-			protected void isClicked() {
-				quitB[q] = true;
-				uppdateAlarmState();
-			}
-		};
+		state[0] = new AlarmDataField(100, 100, 100, 40, normalCol, TYPE_SYSTEM);
+		state[1] = new AlarmDataField(100, 160, 100, 40, normalCol, TYPE_CONNECTION);
 		
 		for (int i = 0; i < length; i++) {
 			textB[i] = "";
 			alarmB[i] = false;
 			warnB[i] = false;
 			quitB[i] = false;
-			state[i] = new DataFiled(100,100+(i*40),200,20,normalCol) {
-				@Override
-				protected void uppdate() {
-				}
-				@Override
-				protected void isClicked() {	
-				}
-			};
-			add(state[i]);
 			
-			if(quit[i]==null){
+			if(state[i]==null){
 				allOk = 2;
+				state[i] = new DataFiled(100,100+(i*40),200,40,normalCol) {
+					@Override
+					protected void uppdate() {
+					}
+					@Override
+					protected void isClicked() {	
+					}
+				};
 				continue;
 			}
-			quit[i].setyPos(100+(i*40));
-			add(quit[i]);
+			state[i].setTextColor(Color.white);
+			add(state[i]);
+			//quit[i].setyPos(100+(i*40));
+			//add(quit[i]);
 		}
 		warn = this;
+		
+		Button quitAll = new Button(1000,100,"res/win/gui/cli/G") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				for (int i = 0; i < length; i++) {
+					quitB(i);
+				}
+			}
+		};
+		quitAll.setText("Quit All");
+		add(quitAll);
 	}
 	
 	@Override
 	protected void uppdateIntern() {
-		
+		boolean b = System.currentTimeMillis()/500%2==0;
+		if(b != blinkState){
+			blinkState = b;
+			boolean bace = false;
+			for (int i = 0; i < length; i++) {
+				if(quitB[i])continue;
+				bace = warnB[i];
+				if(alarmB[i]){
+					if(blinkState){
+						state[i].setColor(Color.black);
+						state[i].setTextColor(alarmCol);
+					}else{
+						state[i].setTextColor(Color.black);
+						state[i].setColor(alarmCol);
+					}
+				}else if(bace){
+					if(!blinkState){
+						state[i].setColor(warnCol);
+					}else{
+						state[i].setColor(warnColB);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -114,7 +134,7 @@ public class WarnMenu extends menu.AbstractMenu{
 		}
 		if(textB[type].compareTo(text) != 0){
 			if(externState[type]!=null)externState[type].setText(text);
-			state[type].setText(text);
+			setTexts(type, text);
 			textB[type] = text;
 		}
 		
@@ -138,7 +158,8 @@ public class WarnMenu extends menu.AbstractMenu{
 		if(!alarmB[type]){
 			if(textB[type].compareTo(text) != 0){
 				if(externState[type]!=null)externState[type].setText(text);
-				state[type].setText(text);
+				setTexts(type, text);
+				textB[type] = text;
 			}
 		}
 		
@@ -197,4 +218,62 @@ public class WarnMenu extends menu.AbstractMenu{
 		alarmButton.setAlarm(overallAlarm);
 		alarmButton.setWarn(overallWarn);
 	}
+	
+	private void setTexts(int type, String text){
+		String[] s = text.split(" ");
+		if(s.length == 1){
+			state[type].setText(text);
+			state[type].setSecondLine(null);
+			return;
+		}
+		int i = s.length/2;
+		String text2 = "";
+		text = "";
+		int qr = 0;
+		if(s.length%2 == 1)qr = 1;
+		for (int j = 0; j < i; j++) {
+			text+=s[j]+" ";
+			text2+=s[i+j+qr]+" ";
+		}
+		if(qr == 1){
+			text+=s[i];
+		}
+		state[type].setText(text);
+		state[type].setSecondLine(text2);
+	}
+	
+	public void quitB(int type){
+		if(type < 0 || type >= length){
+			debug.Debug.println("* Error WarnMenu01a: Type dosn't match Button! Type="+type,debug.Debug.ERROR);
+			return;
+		}
+		if(alarmB[type]){
+			state[type].setTextColor(Color.black);
+			state[type].setColor(alarmCol);
+		}else if(warnB[type]){
+			state[type].setColor(warnCol);
+		}
+		quitB[type] = true;
+		uppdateAlarmState();
+	}
+}
+
+class AlarmDataField extends DataFiled{
+	private int atsa;
+	
+	public AlarmDataField(int x, int y, int wi, int hi, Color c, int ats) {
+		super(x, y, wi, hi, c);
+		atsa = ats;
+	}
+	
+	@Override
+	protected void uppdate() {}
+	@Override
+	protected void isFocused() {}
+
+	@Override
+	protected void isClicked() {
+		WarnMenu.warn.quitB(atsa);
+	}
+	
 }

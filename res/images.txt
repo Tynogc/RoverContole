@@ -129,3 +129,15 @@ res/win/gui/cli/001c.png
 res/win/gui/cli/001f.png
 res/win/gui/cli/001d.png
 res/win/gui/cli/001d.png
+res/win/intro.png
+res/win/intro.png
+res/win/gui/cli/gskn.png
+res/win/gui/cli/gskc.png
+res/win/gui/cli/gskf.png
+res/win/gui/cli/gskd.png
+res/win/gui/cli/gskd.png
+res/win/gui/cli/Cn.png
+res/win/gui/cli/Cc.png
+res/win/gui/cli/Cf.png
+res/win/gui/cli/Cd.png
+res/win/gui/cli/Cd.png

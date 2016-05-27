@@ -56,7 +56,13 @@ public abstract class DataFiled extends Button{
 			
 			g.setFont(font);
 			g.setColor(textColor);
-			g.drawString(text, xPos+offsettext+2, yPos+(ySize/2)+5);
+			//g.drawString(text, xPos+offsettext+2, yPos+(ySize/2)+5);
+			if(subtext2 != null){
+				g.drawString(text, xPos+offsettext, yPos+(ySize/2));
+				g.drawString(subtext2, xPos+offsetSubtext2, yPos+(ySize/2)+10);
+			}else{
+				g.drawString(text, xPos+offsettext, yPos+(ySize/2)+5);
+			}
 		}
 		
 		next.paintYou(g);

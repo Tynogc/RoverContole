@@ -3,6 +3,7 @@ package guiMenu;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import userInterface.GuiControle;
 import userInterface.MainFrame;
 import userInterface.MainThread;
 import menu.AbstractMenu;
@@ -88,6 +89,24 @@ public class TopLevelMenu extends AbstractMenu{
 		};
 		add(b3);
 		b3.setText("GPS");
+		
+		Button sbn1 = new Button(1200, 20, MenuConstants.filePathButton+"Gs") {
+			private boolean ac = true;
+			@Override
+			protected void uppdate() {
+			}
+			
+			@Override
+			protected void isFocused() {
+			}
+			
+			@Override
+			protected void isClicked() {
+				ac = !ac;
+				GuiControle.sideMenuNormal(ac);
+			}
+		};
+		add(sbn1);
 		
 		alarm = new AlarmkButton(540,20,"res/win/gui/spb/alb/") {
 			//private boolean at;

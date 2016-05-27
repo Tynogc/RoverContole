@@ -1,5 +1,6 @@
 package userInterface;
 
+import guiMenu.PerformanceMenu;
 import guiMenu.PicLoader;
 import guiMenu.SettingsMenu;
 import guiMenu.WarnMenu;
@@ -7,6 +8,7 @@ import guiMenu.WarnMenu;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Panel;
@@ -15,7 +17,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 
 import debug.DebugMenu;
-
 import process.ProcessControl;
 
 public class MainFrame extends Panel{
@@ -50,6 +51,8 @@ public class MainFrame extends Panel{
 	public static boolean fullScreen = true;
 	public static byte playIntro = 0; //0: Play, 1: Play Simple ELSE: dont play
 	
+	private StartAnimation startAnim;
+	
 	private boolean startUpBoolean;
 	
 	private static GraphicsDevice device = 
@@ -70,13 +73,21 @@ public class MainFrame extends Panel{
 		Dimension dim = getToolkit().getScreenSize();
 		int per = 60;
 		int qPer = 15;
+		
+		frame = new JFrame("Seypris");
+		if(fullScreen){
+			frame.setUndecorated(true);
+			frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+			per = 0;
+			qPer = 0;
+			
+		}
 		frameX = dim.width-qPer;
 		frameY = dim.height-per;
 		if(frameX > sizeX)frameX = sizeX;
 		if(frameY > sizeY)frameY = sizeY;
 		
-		frame = new JFrame();
-		frame.setBounds(10,10, frameX+10, frameY);
+		frame.setBounds(10,10, frameX+10, frameY+70);
 		
 		setBounds(0,0,frameX, frameY);
 		frame.add(this);
@@ -96,17 +107,21 @@ public class MainFrame extends Panel{
 		new PicLoader();
 		dbm = new DebugMenu();
 		
+		if(playIntro == 0){
+			startAnim = new StartAnimation(true);
+		}else if(playIntro == 1){
+			startAnim = new StartAnimation(false);
+		}
+		
 		if(standartStartUp){
 			debug.Debug.bootMsg("Starting Thread", 0);
 			thread = new MainThread(this);
 			thread.start();
 			
+			setVisible(true);
 			frame.setVisible(true);
 			debug.Debug.bootMsg("Frame Open", 0);
 			debug.Debug.panel.setVisible(!hideDebugFrame);
-			if(fullScreen){
-				device.setFullScreenWindow(frame);
-			}
 		}
 		
 		GuiControle.warnMenu = new guiMenu.WarnMenu();
@@ -119,7 +134,7 @@ public class MainFrame extends Panel{
 		
 		comunication.setComMenue(gui.comMenu);
 		
-		//new process.SoundPlayer();
+		new process.SoundPlayer();
 		
 		startUpBoolean = false;
 		debug.Debug.bootMsg("Window open - Boot DONE", 0);
@@ -129,30 +144,43 @@ public class MainFrame extends Panel{
 			thread = new MainThread(this);
 			thread.start();
 			
+			setVisible(true);
 			frame.setVisible(true);
 			debug.Debug.bootMsg("Frame Open", 0);
-			if(fullScreen){
-				device.setFullScreenWindow(frame);
-			}
 		}
 		
 		debug.Debug.panel.setVisible(false);
+		
+		WarnMenu.warn.setWarn(true, WarnMenu.TYPE_SYSTEM, "Warns at Boot!");
 	}
 	
 	public void loop(int fps, int secFps, int thiFps, int triFps){
+		PerformanceMenu.startTime();
 		BufferedImage b = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = b.getGraphics();
 		g.setColor(Color.black);
 		g.fillRect(0,0, sizeX, sizeY);
+		PerformanceMenu.markTime(PerformanceMenu.CreateBuffer);
 		
 		
 		if(!startUpBoolean){
 			comunication.process();
+			PerformanceMenu.markTime(PerformanceMenu.Communication);
 			process.loop();
+			PerformanceMenu.markTime(PerformanceMenu.Process);
 			gui.uppdate();
 			gui.paint(g);
+			PerformanceMenu.markTime(PerformanceMenu.PaintGui);
 		}else{
 			dbm.paintYou(g);
+		}
+		
+		if(startAnim != null){
+			boolean bcl = startAnim.uppdate();
+			startAnim.paint(g, (frameX-370)/2, (frameY-300)/2);
+			if(bcl && !startUpBoolean){
+				startAnim = null;
+			}
 		}
 		
 		if(nonFullFrame){
@@ -175,16 +203,17 @@ public class MainFrame extends Panel{
 		
 		g.setColor(Color.green);
 		g.setFont(menu.Button.plainFont);
-		g.drawString("FPS: "+fps, 1200, 14);
-		g.drawString("T: ["+thiFps+"] ["+triFps+"]", 1200, 30);
+		g.drawString("FPS: "+fps, 1300, 14);
+		g.drawString("T: ["+thiFps+"] ["+triFps+"]", 1300, 30);
 		if(secFps<0)g.setColor(Color.red);
 		secFps = -secFps+50;
 		double fpsDpe = (double)secFps/50.0;
 		secFps = (int)(fpsDpe*100.0);
-		g.drawString("Load:"+secFps/100+""+(secFps/10)%10+""+secFps%10+"%", 1250, 14);
+		g.drawString("Load:"+secFps/100+""+(secFps/10)%10+""+secFps%10+"%", 1350, 14);
 		
 		buffer = b;
 		paint(getGraphics());
+		PerformanceMenu.markTime(PerformanceMenu.PaintBack);
 	}
 	
 	public void paint(Graphics g){
@@ -199,7 +228,7 @@ public class MainFrame extends Panel{
 		offY = 0;
 		frameX = x;
 		frameY = y;
-		frame.setSize(x+10,y);
+		frame.setSize(x+10,y+70);
 		setSize(x,y);
 	}
 	
