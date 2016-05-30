@@ -86,6 +86,8 @@ public class GuiControle {
 		key.setBottomMenu(bo);
 		setSecondMenu(comMenu);
 		
+		warnMenu.setLooker(bo.getLooker());
+		
 		debug.Debug.bootMsg("GUI-Frames DONE! ", 0);
 	}
 	
@@ -107,6 +109,10 @@ public class GuiControle {
 		bottMenu.scrolled(mouse.rot);
 		logMenu.scrolled(mouse.rot);
 		mouse.rot = 0;
+		
+		//WarnMenu updaten
+		if(warnMenu != null)
+			warnMenu.uppdateLooker();
 		
 		mouse.leftClicked = false;
 		mouseX = mouse.x;

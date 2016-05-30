@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import debug.Debug;
-
 import userInterface.GuiControle;
 import userInterface.MainFrame;
 import menu.Button;
+import menu.DataFiled;
 
 public class BottomMenu extends menu.AbstractMenu{
 	
@@ -19,6 +19,8 @@ public class BottomMenu extends menu.AbstractMenu{
 	private Button prog;
 	
 	private Button settings;
+	
+	private DataFiled looker;
 	
 	public BottomMenu() {
 		
@@ -96,7 +98,20 @@ public class BottomMenu extends menu.AbstractMenu{
 		};
 		add(settings);
 		settings.setSubtext("Settings");
+		
+		looker = new DataFiled(2,MainFrame.sizeY-160,600,20,Color.blue) {
+			@Override
+			protected void uppdate() {
+			}
+			@Override
+			protected void isClicked() {
+				GuiControle.setSecondMenu(GuiControle.warnMenu);
+			}
+		};
+		add(looker);
 	}
+	
+	public DataFiled getLooker(){return looker;}
 
 	@Override
 	protected void uppdateIntern() {

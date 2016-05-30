@@ -435,8 +435,8 @@ public class MapView extends menu.AbstractMenu{
 
 	@Override
 	protected void paintIntern(Graphics g) {
-		int x = -20;
-		int y = 200;
+		final int x = -20;
+		final int y = 200;
 		
 		paintMapOnMainpage(g);
 		

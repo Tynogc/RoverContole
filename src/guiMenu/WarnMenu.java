@@ -3,6 +3,7 @@ package guiMenu;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import process.SoundPlayer;
 import menu.AlarmkButton;
 import menu.Button;
 import menu.DataFiled;
@@ -15,11 +16,15 @@ public class WarnMenu extends menu.AbstractMenu{
 	private String[] textB;
 	
 	//private Button[] quit;
-	private DataFiled[] state;
+	private AlarmDataField[] state;
 	private DataFiled[] externState;
 	
 	public boolean overallAlarm = false;
 	public boolean overallWarn = false;
+	public boolean isThereAlarm = false;
+	public boolean isThereWarn = false;
+	private int lastWarn;
+	private int lastAlarm;
 	
 	private static final int length = 4;
 	
@@ -30,12 +35,15 @@ public class WarnMenu extends menu.AbstractMenu{
 	
 	public static final int TYPE_SYSTEM = 0;
 	public static final int TYPE_CONNECTION = 1;
+	public static final int TYPE_SYSTEM_THREADS = 2;
 	
 	public static WarnMenu warn = null;
 	
 	private AlarmkButton alarmButton;
 	
 	private boolean blinkState = true;
+	
+	private DataFiled looker;
 	
 	public WarnMenu(){
 		alarmButton = null;
@@ -47,11 +55,12 @@ public class WarnMenu extends menu.AbstractMenu{
 		textB = new String[length];
 		
 		//quit = new Button[length];
-		state  = new DataFiled[length];
+		state  = new AlarmDataField[length];
 		externState  = new DataFiled[length];
 		
 		state[0] = new AlarmDataField(100, 100, 100, 40, normalCol, TYPE_SYSTEM);
 		state[1] = new AlarmDataField(100, 160, 100, 40, normalCol, TYPE_CONNECTION);
+		state[2] = new AlarmDataField(100, 220, 100, 40, normalCol, TYPE_SYSTEM_THREADS);
 		
 		for (int i = 0; i < length; i++) {
 			textB[i] = "";
@@ -61,14 +70,7 @@ public class WarnMenu extends menu.AbstractMenu{
 			
 			if(state[i]==null){
 				allOk = 2;
-				state[i] = new DataFiled(100,100+(i*40),200,40,normalCol) {
-					@Override
-					protected void uppdate() {
-					}
-					@Override
-					protected void isClicked() {	
-					}
-				};
+				state[i] = new AlarmDataField(100,100+(i*40),200,40,normalCol, 0);
 				continue;
 			}
 			state[i].setTextColor(Color.white);
@@ -121,6 +123,117 @@ public class WarnMenu extends menu.AbstractMenu{
 			}
 		}
 	}
+	
+	private boolean blinkStateLooker = false;
+	private byte lookerState = 0;
+	private int lookerText = -1;
+	private boolean needUpdate = false;
+	public void uppdateLooker(){
+		byte n = 0;
+		if(overallAlarm)n = 1;
+		else if(isThereAlarm)n = 2;
+		else if(overallWarn)n = 3;
+		else if(isThereWarn)n = 4;
+		else n = 5;
+		
+		if(n == 1 || n == 3){
+			boolean b = System.currentTimeMillis()/500%2==0;
+			if(b != blinkStateLooker || n != lookerState || needUpdate){
+				blinkStateLooker = b;
+				if(n == 1){
+					if(blinkStateLooker){
+						looker.setColor(Color.black);
+						looker.setTextColor(alarmCol);
+					}else{
+						looker.setTextColor(Color.black);
+						looker.setColor(alarmCol);
+					}
+					inputLookerText(lastAlarm, true, true);
+				}
+				if(n == 3){
+					if(blinkStateLooker){
+						looker.setColor(warnCol);
+						looker.setTextColor(Color.black);
+					}else{
+						looker.setTextColor(Color.black);
+						looker.setColor(warnColB);
+					}
+					inputLookerText(lastWarn, false, true);
+				}
+			}
+			lookerState = n;
+		}
+		
+		if(lookerState != n){
+			if(n == 2){
+				looker.setTextColor(Color.black);
+				looker.setColor(alarmCol);
+			}
+			if(n == 4){
+				looker.setTextColor(Color.black);
+				looker.setColor(warnCol);
+			}
+			if(n == 5){
+				looker.setTextColor(Color.white);
+				looker.setColor(normalCol);
+				looker.setText("ALL OK");
+			}
+		}
+		if(needUpdate){
+			if(n == 2){
+				inputLookerText(lastAlarm, true, false);
+			}
+			if(n == 4){
+				inputLookerText(lastWarn, false, false);
+			}
+		}
+		needUpdate = false;
+		lookerState = n;
+	}
+	
+	private void inputLookerText(int i, boolean al, boolean qi){
+		if(lookerText == i && !needUpdate)return;
+		if(i < 0 || i >= length){
+			debug.Debug.println("* Error WarnMenu01z: Type dosn't match Button! Type="+i,debug.Debug.ERROR);
+			return;
+		}
+		if(qi){
+			if(quitB[i]){
+				i = searchAlternated(i);
+				if(al) lastAlarm = i;
+				else lastWarn = i;
+			}
+		}else if(al){
+			if(!alarmB[i]){
+				i = searchAlternated(i);
+				lastAlarm = i;
+			}
+		}else{
+			if(!warnB[i]){
+				i = searchAlternated(i);
+				lastWarn = i;
+			}
+		}
+		
+		lookerText = i;
+		looker.setText(getTypeName(i)+": "+textB[i]);
+	}
+	
+	private int searchAlternated(int k){
+		for (int i = 0; i < length; i++) {
+			if(alarmB[i] && !quitB[i])return i;
+		}
+		for (int i = 0; i < length; i++) {
+			if(alarmB[i])return i;
+		}
+		for (int i = 0; i < length; i++) {
+			if(warnB[i] && !quitB[i])return i;
+		}
+		for (int i = 0; i < length; i++) {
+			if(warnB[i])return i;
+		}
+		return k;
+	}
 
 	@Override
 	protected void paintIntern(Graphics g) {
@@ -136,9 +249,16 @@ public class WarnMenu extends menu.AbstractMenu{
 			if(externState[type]!=null)externState[type].setText(text);
 			setTexts(type, text);
 			textB[type] = text;
+			if(a)
+				lastAlarm = type;
+			needUpdate = true;
 		}
 		
 		if(alarmB[type] != a){
+			if(!alarmB[type]){
+				SoundPlayer.playSound(SoundPlayer.SOUND_ALARM);
+				warnB[type]=false;
+			}
 			alarmB[type] = a;
 			quitB[type] = false;
 			
@@ -146,6 +266,7 @@ public class WarnMenu extends menu.AbstractMenu{
 			uppdateAlButton(alarmB[type], warnB[type], state[type]);
 			
 			uppdateAlarmState();
+			needUpdate = true;
 		}
 	}
 	
@@ -160,24 +281,32 @@ public class WarnMenu extends menu.AbstractMenu{
 				if(externState[type]!=null)externState[type].setText(text);
 				setTexts(type, text);
 				textB[type] = text;
+				if(a)
+					lastWarn = type;
+				needUpdate = true;
 			}
-		}
 		
-		if(warnB[type] != a){
-			warnB[type] = a;
-			quitB[type] = false;
+			if(warnB[type] != a){
+				warnB[type] = a;
+				quitB[type] = false;
 			
-			uppdateAlButton(alarmB[type], warnB[type], externState[type]);
-			uppdateAlButton(alarmB[type], warnB[type], state[type]);
+				uppdateAlButton(alarmB[type], warnB[type], externState[type]);
+				uppdateAlButton(alarmB[type], warnB[type], state[type]);
 			
-			uppdateAlarmState();
+				uppdateAlarmState();
+				needUpdate = true;
+			}
 		}
 	}
 	
 	private void uppdateAlarmState(){
+		isThereAlarm = false;
+		isThereWarn = false;
 		overallAlarm = false;
 		overallWarn = false;
 		for (int i = 0; i < length; i++) {
+			if(alarmB[i])isThereAlarm = true;
+			if(warnB[i])isThereWarn = true;
 			if(quitB[i])continue;
 			if(alarmB[i])overallAlarm = true;
 			if(warnB[i])overallWarn = true;
@@ -254,7 +383,42 @@ public class WarnMenu extends menu.AbstractMenu{
 			state[type].setColor(warnCol);
 		}
 		quitB[type] = true;
+		needUpdate = true;
 		uppdateAlarmState();
+	}
+	
+	public void setLooker(DataFiled l){
+		looker = l;
+		if(!overallAlarm && !overallWarn){
+			looker.setColor(normalCol);
+			looker.setText("ALL OK");
+			return;
+		}
+		for (int i = 0; i < length; i++) {
+			if(warnB[i]){
+				looker.setColor(warnCol);
+				looker.setText(textB[i]);
+			}
+			if(alarmB[i]){
+				looker.setColor(alarmCol);
+				looker.setText(textB[i]);
+				return;
+			}
+		}
+	}
+	
+	public static String getTypeName(int a){
+		switch (a) {
+		case TYPE_SYSTEM:
+			return "System";
+		case TYPE_CONNECTION:
+			return "Connection";
+		case TYPE_SYSTEM_THREADS:
+			return "Sys Threads";
+
+		default:
+			return "???";
+		}
 	}
 }
 
@@ -274,6 +438,13 @@ class AlarmDataField extends DataFiled{
 	@Override
 	protected void isClicked() {
 		WarnMenu.warn.quitB(atsa);
+	}
+	
+	public void paintYou(Graphics g){
+		super.paintYou(g);
+		g.setColor(Color.gray);
+		g.setFont(plainFont);
+		g.drawString(WarnMenu.getTypeName(atsa), xPos+1, yPos-3);
 	}
 	
 }

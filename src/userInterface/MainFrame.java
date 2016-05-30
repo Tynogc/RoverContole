@@ -169,6 +169,7 @@ public class MainFrame extends Panel{
 			process.loop();
 			PerformanceMenu.markTime(PerformanceMenu.Process);
 			gui.uppdate();
+			PerformanceMenu.markTime(PerformanceMenu.UpdateGui);
 			gui.paint(g);
 			PerformanceMenu.markTime(PerformanceMenu.PaintGui);
 		}else{
