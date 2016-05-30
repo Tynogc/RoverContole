@@ -32,6 +32,7 @@ public class GuiControle {
 	public static guiMenu.GPSstatus gpsStat;
 	public static guiMenu.WarnMenu warnMenu;
 	public static guiMenu.MapView mapMenu;
+	public static guiMenu.Telemetry telemetry;
 	
 	private static guiMenu.SideMenu sideM;
 	private static guiMenu.PerformanceMenu sideM2;
@@ -82,6 +83,9 @@ public class GuiControle {
 		
 		mapMenu = new guiMenu.MapView();
 		debug.Debug.bootMsg("MapMenu", mapMenu.getStatus());
+		
+		telemetry = new guiMenu.Telemetry(mapMenu);
+		debug.Debug.bootMsg("Telemetry", telemetry.getStatus());
 		
 		key.setBottomMenu(bo);
 		setSecondMenu(comMenu);

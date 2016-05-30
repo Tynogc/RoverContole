@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import userInterface.MainFrame;
 import menu.AbstractMenu;
 import menu.Button;
+import menu.OsziDiagramm;
 
 public class PerformanceMenu extends AbstractMenu{
 
@@ -35,8 +36,10 @@ public class PerformanceMenu extends AbstractMenu{
 	
 	private Color[] cols;
 	
+	private OsziDiagramm digrammLog;
+	private OsziDiagramm diagrammLogRam;
+	
 	public PerformanceMenu() {
-		per = this;
 		
 		time = new int[lenght];
 		max = new int[lenght];
@@ -62,6 +65,14 @@ public class PerformanceMenu extends AbstractMenu{
 			percentage[i] = 0.0;
 		}
 		
+		digrammLog = new OsziDiagramm(MainFrame.sizeX-370, 75, PicLoader.pic.getImage("res/win/sub/tsk.png"));
+		digrammLog.setText("Load:");
+		add(digrammLog);
+		diagrammLogRam = new OsziDiagramm(MainFrame.sizeX-250, 75, PicLoader.pic.getImage("res/win/sub/tsk.png"));
+		diagrammLogRam.setText("RAM:");
+		add(diagrammLogRam);
+		
+		per = this;
 		/**
 		 * DEBUG_ONLY section ahead!!!!!!!!!!!!!!!!!!!
 		 */
@@ -176,6 +187,7 @@ public class PerformanceMenu extends AbstractMenu{
 		if(iSiera>1000)iSiera = 1000;
 		
 		double lo = -((double)(time[lenght-1]-time[lenght-2])/(double)time[lenght-1]*100)+100;
+		logInDia(lo);
 		load = (load*9+(double)lo)/10;
 		loadN = (loadN*(iSiera-1)+(double)lo)/iSiera;
 		long sum = 0;
@@ -193,6 +205,27 @@ public class PerformanceMenu extends AbstractMenu{
 		}
 		nanosecFull = (nanosecFull*49+sum)/50;
 		nanosec = (nanosec*49+(sum-time[lenght-1]))/50;
+	}
+	
+	private double logData= 0.0;
+	private static int logTetta = 0;
+	private void logInDia(double lo){
+		logTetta++;
+		
+		logData = (logData*(logTetta-1)+lo)/logTetta;
+		
+		if(logTetta>20){
+			logTetta = 0;
+			digrammLog.logData(logData/100.0+0.02);
+			logData = 0;
+		}
+	}
+	
+	public static void logRam(double r){
+		if(per!= null)per.loRam(r);
+	}
+	private void loRam(double r){
+		diagrammLogRam.logData(r);
 	}
 	
 	private long getTime(){

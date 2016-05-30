@@ -330,11 +330,13 @@ public class ComunicationMenu extends AbstractMenu{
 		add(reconect);
 		
 		changeCon = new comunication.ConnectionChange(600, 300, k);
-		add(changeCon.save);
+		
 		add(changeCon.ip);
 		add(changeCon.ipText);
 		add(changeCon.port);
 		add(changeCon.portText);
+		add(changeCon.save);
+		//debug.Debug.println(changeCon.save.getxSize()+" "+changeCon.save.getySize());
 		
 		setUpLink(new String[]{
 				"***GPS***C124.234_L1254.43_H340_S10",
@@ -419,7 +421,7 @@ public class ComunicationMenu extends AbstractMenu{
 				g.setColor(Color.red);
 				g.drawString(s[i].substring(10), 51, 12+(i-pos)*12);
 				g.setColor(Color.blue);
-			}else if(s[i].charAt(10) == 'ß'){
+			}else if(s[i].charAt(10) == 'ï¿½'){
 				g.setColor(Color.gray);
 				g.drawString(s[i].substring(10), 51, 12+(i-pos)*12);
 				g.setColor(Color.blue);
@@ -451,7 +453,7 @@ public class ComunicationMenu extends AbstractMenu{
 				}
 			}
 			if(f){
-				commands[i] = s[i].substring(0, 10)+"ß"+s[i].substring(10);
+				commands[i] = s[i].substring(0, 10)+"ï¿½"+s[i].substring(10);
 			}else{
 				commands[i] = s[i];
 			}

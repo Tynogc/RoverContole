@@ -63,7 +63,7 @@ public class TopLevelMenu extends AbstractMenu{
 			
 			@Override
 			protected void isClicked() {
-				userInterface.GuiControle.setSecondMenu(userInterface.GuiControle.mapMenu);
+				userInterface.GuiControle.setSecondMenu(userInterface.GuiControle.telemetry);
 			}
 		};
 		add(b2);
@@ -220,6 +220,10 @@ public class TopLevelMenu extends AbstractMenu{
 			RAMfree.setText("Free RAM "+getByteName(runtime.freeMemory()));
 			RAMtotal.setText("Total RAM "+getByteName(runtime.totalMemory()));
 			RAMmax.setText(" Max RAM "+getByteName(runtime.maxMemory()));
+			
+			double r = (double)(runtime.totalMemory()-runtime.freeMemory());
+			
+			PerformanceMenu.logRam(r/runtime.maxMemory());
 		}
 	}
 

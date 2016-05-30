@@ -13,6 +13,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Panel;
 import java.awt.image.BufferedImage;
+import java.util.Properties;
 
 import javax.swing.JFrame;
 
@@ -58,6 +59,9 @@ public class MainFrame extends Panel{
 	private static GraphicsDevice device = 
 			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 	
+	private BufferedImage[] buffers;
+	private int bufferInUse;
+	
 	public MainFrame(){
 		super();
 		startUpBoolean = true;
@@ -81,6 +85,13 @@ public class MainFrame extends Panel{
 			per = 0;
 			qPer = 0;
 			
+		}
+		String os = System.getProperty("os.name");
+		if(os != null){
+			if(os.contains("nux")){
+			debug.Debug.println("OS: Linux");
+			per = 50;
+			}
 		}
 		frameX = dim.width-qPer;
 		frameY = dim.height-per;
@@ -112,6 +123,12 @@ public class MainFrame extends Panel{
 		}else if(playIntro == 1){
 			startAnim = new StartAnimation(false);
 		}
+		
+		buffers = new BufferedImage[]{
+				new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB),
+				new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB)
+		};
+		bufferInUse = 0;
 		
 		if(standartStartUp){
 			debug.Debug.bootMsg("Starting Thread", 0);
@@ -156,8 +173,8 @@ public class MainFrame extends Panel{
 	
 	public void loop(int fps, int secFps, int thiFps, int triFps){
 		PerformanceMenu.startTime();
-		BufferedImage b = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);
-		Graphics g = b.getGraphics();
+		
+		Graphics g = buffers[bufferInUse].getGraphics();
 		g.setColor(Color.black);
 		g.fillRect(0,0, sizeX, sizeY);
 		PerformanceMenu.markTime(PerformanceMenu.CreateBuffer);
@@ -212,7 +229,9 @@ public class MainFrame extends Panel{
 		secFps = (int)(fpsDpe*100.0);
 		g.drawString("Load:"+secFps/100+""+(secFps/10)%10+""+secFps%10+"%", 1350, 14);
 		
-		buffer = b;
+		buffer = buffers[bufferInUse];
+		bufferInUse++;
+		if(bufferInUse>= buffers.length)bufferInUse = 0;
 		paint(getGraphics());
 		PerformanceMenu.markTime(PerformanceMenu.PaintBack);
 	}

@@ -71,7 +71,7 @@ public class ConnectionChange {
 		};
 		portText.setText("PORT");
 		
-		save = new Button(x+200,y,"res/win/gui/cli/gsk") {
+		save = new Button(x+200,y,"res/win/gui/cli/Gsk") {
 			@Override
 			protected void uppdate() {
 			}
