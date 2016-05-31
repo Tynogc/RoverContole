@@ -48,12 +48,12 @@ public class PerformanceMenu extends AbstractMenu{
 		percentage = new double[lenght];
 		
 		cols = new Color[]{
-				new Color(40,200,40),
-				Color.yellow,
-				new Color(0,100,250),
-				Color.orange,
-				Color.white,
 				Color.red,
+				new Color(234,187,0),
+				new Color(102,52,228),
+				new Color(0,219,46),
+				new Color(0,11,235),
+				new Color(0,187,221),
 				Color.gray
 		};
 		

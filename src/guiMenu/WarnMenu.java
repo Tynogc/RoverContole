@@ -2,11 +2,14 @@ package guiMenu;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import process.SoundPlayer;
 import menu.AlarmkButton;
 import menu.Button;
 import menu.DataFiled;
+import menu.ScrollBar;
 
 public class WarnMenu extends menu.AbstractMenu{
 
@@ -44,6 +47,13 @@ public class WarnMenu extends menu.AbstractMenu{
 	private boolean blinkState = true;
 	
 	private DataFiled looker;
+	
+	private ScrollBar notificationScrBar;
+	private String[] notifications;
+	private final int notAtY = 600;
+	private final String alString = "[ALARM]";
+	private final String waString = "[WARN ]";
+	private final String okString = "[ OK  ]";
 	
 	public WarnMenu(){
 		alarmButton = null;
@@ -94,6 +104,10 @@ public class WarnMenu extends menu.AbstractMenu{
 		};
 		quitAll.setText("Quit All");
 		add(quitAll);
+		
+		notifications = new String[100];
+		notificationScrBar = new ScrollBar(500, notAtY-20, 140, 10, 60);
+		add(notificationScrBar);
 	}
 	
 	@Override
@@ -234,10 +248,51 @@ public class WarnMenu extends menu.AbstractMenu{
 		}
 		return k;
 	}
+	
+	private void addAlarmString(String s, boolean al, boolean wa){
+		for (int i = notifications.length-1; i > 0; i--) {
+			notifications[i] = notifications[i-1];
+		}
+		long a = System.currentTimeMillis();
+		String c;
+		long ap;
+		a/=1000;
+		ap = a%60;
+		c="."+(ap/10)%6+""+ap%10;
+		a/=60;
+		ap = a%60;
+		c=":"+(ap/10)%10+""+ap%10+c;
+		a/=60;
+		a= a%24;
+		c=""+(a/10)+""+a%10+c;
+		if(al){
+			s = alString+s;
+		}else if(wa){
+			s = waString+s;
+		}else{
+			s = okString+s;
+		}
+		notifications[0] = "["+c+"]"+s;
+	}
 
 	@Override
 	protected void paintIntern(Graphics g) {
-		
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setFont(Button.plainFont);
+		String s;
+		for (int i = 0; i < 10; i++) {
+			if(notifications.length-1<=i+notificationScrBar.getScrolled())break;
+			s = notifications[i+notificationScrBar.getScrolled()];
+			if(s==null)continue;
+			if(s.length() <= 10)continue;
+			g2d.setColor(Color.WHITE);
+			g2d.drawString(s.substring(0, 10), 10, notAtY+i*15);
+			if(s.contains(alString))g2d.setColor(alarmCol);
+			else if(s.contains(waString))g2d.setColor(warnCol);
+			else g2d.setColor(normalCol);
+			g2d.drawString(s.substring(10), 80, notAtY+i*15);
+		}
 	}
 	
 	public void setAlarm(boolean a, int type, String text){
@@ -252,6 +307,8 @@ public class WarnMenu extends menu.AbstractMenu{
 			if(a)
 				lastAlarm = type;
 			needUpdate = true;
+			
+			addAlarmString(getTypeName(type)+": "+text, a, false);
 		}
 		
 		if(alarmB[type] != a){
@@ -284,6 +341,8 @@ public class WarnMenu extends menu.AbstractMenu{
 				if(a)
 					lastWarn = type;
 				needUpdate = true;
+				
+				addAlarmString(getTypeName(type)+": "+text, false, a);
 			}
 		
 			if(warnB[type] != a){
