@@ -421,7 +421,7 @@ public class ComunicationMenu extends AbstractMenu{
 				g.setColor(Color.red);
 				g.drawString(s[i].substring(10), 51, 12+(i-pos)*12);
 				g.setColor(Color.blue);
-			}else if(s[i].charAt(10) == '�'){
+			}else if(s[i].charAt(10) == '$'){
 				g.setColor(Color.gray);
 				g.drawString(s[i].substring(10), 51, 12+(i-pos)*12);
 				g.setColor(Color.blue);
@@ -453,7 +453,7 @@ public class ComunicationMenu extends AbstractMenu{
 				}
 			}
 			if(f){
-				commands[i] = s[i].substring(0, 10)+"�"+s[i].substring(10);
+				commands[i] = s[i].substring(0, 10)+"$"+s[i].substring(10);
 			}else{
 				commands[i] = s[i];
 			}

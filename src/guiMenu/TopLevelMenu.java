@@ -135,8 +135,7 @@ public class TopLevelMenu extends AbstractMenu{
 			
 			@Override
 			protected void isClicked() {
-				//TODO schliessen abfragen
-				System.exit(0);
+				GuiControle.setShutdownMenu(new ShutdownMenu(shutDown));
 			}
 		};
 		add(shutDown);

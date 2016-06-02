@@ -34,6 +34,9 @@ public class GuiControle {
 	public static guiMenu.MapView mapMenu;
 	public static guiMenu.Telemetry telemetry;
 	
+	public static menu.MenuControle shutdownMenu;
+	public static guiMenu.ShutdownMenu shutDoM;
+	
 	private static guiMenu.SideMenu sideM;
 	private static guiMenu.PerformanceMenu sideM2;
 	
@@ -101,6 +104,16 @@ public class GuiControle {
 	}
 	
 	public void uppdate(){
+		if(shutdownMenu != null && shutDoM != null){
+			shutdownMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
+			if(!shutDoM.stillActiv()){
+				shutDoM = null;
+				shutdownMenu = null;
+				debug.Debug.println("* ShutDown-Menu deleted", debug.Debug.COM);
+			}
+			mouse.leftClicked = false;
+		}
+		
 		firstM.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
 		secondM.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
 		sideMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
@@ -129,6 +142,10 @@ public class GuiControle {
 		sideMenu.paintYou(g);
 		bottMenu.paintYou(g);
 		logMenu.paintYou(g);
+		
+		if(shutdownMenu != null && shutDoM != null){
+			shutdownMenu.paintYou(g);
+		}
 	}
 	
 	public static void sideMenuNormal(boolean b){
@@ -138,6 +155,12 @@ public class GuiControle {
 		}else{
 			sideMenu.setActivMenu(sideM2);
 		}
+	}
+	
+	public static void setShutdownMenu(guiMenu.ShutdownMenu m){
+		shutdownMenu = new MenuControle();
+		shutdownMenu.setActivMenu(m);
+		shutDoM = m;
 	}
 
 }

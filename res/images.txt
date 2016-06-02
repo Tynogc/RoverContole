@@ -127,3 +127,7 @@ res/gui/oasis/m1b.png
 res/win/oasis/m1.png
 res/win/oasis/m1b.png
 res/win/oasis/m1b.png
+res/win/sub/font0.png
+res/win/sub/font1.png
+res/win/sub/font2.png
+res/win/sub/font2.png

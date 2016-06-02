@@ -325,6 +325,9 @@ public class WarnMenu extends menu.AbstractMenu{
 			uppdateAlarmState();
 			needUpdate = true;
 		}
+		
+		if(!a)
+			lastAlarm = searchAlternated(type);
 	}
 	
 	public void setWarn(boolean a, int type, String text){
@@ -340,6 +343,8 @@ public class WarnMenu extends menu.AbstractMenu{
 				textB[type] = text;
 				if(a)
 					lastWarn = type;
+				else
+					lastAlarm = searchAlternated(type);
 				needUpdate = true;
 				
 				addAlarmString(getTypeName(type)+": "+text, false, a);
@@ -355,6 +360,8 @@ public class WarnMenu extends menu.AbstractMenu{
 				uppdateAlarmState();
 				needUpdate = true;
 			}
+			if(!a)
+				lastWarn = searchAlternated(type);
 		}
 	}
 	
