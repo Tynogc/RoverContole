@@ -1,5 +1,7 @@
 package comunication;
 
+import guiMenu.WarnMenu;
+
 public class ComunicationControl {
 	
 	private Linker linker;
@@ -17,7 +19,12 @@ public class ComunicationControl {
 	public static int lostPacks;
 	public static int lpTerminater;
 	
-	public static boolean quitRestarting = false;
+	private static boolean quitRestarting = false;
+	private static boolean sendTelemetry = true;
+	
+	private static boolean isRestarting = false;
+	
+	private static boolean LostPackageWarning = false;
 	
 	//public static String connStatus = "";
 	public static boolean connError = false;
@@ -28,6 +35,8 @@ public class ComunicationControl {
 	public static double ecessTime = 0;
 	
 	private static final int WARN_TYPE = guiMenu.WarnMenu.TYPE_CONNECTION;
+	
+	public static ComunicationControl com;
 	
 	public ComunicationControl(){
 		linker = new Linker();
@@ -57,6 +66,8 @@ public class ComunicationControl {
 			connError = true;
 		}
 		lastPingSend = System.currentTimeMillis();
+		
+		com = this;
 	}
 	
 	private void printWait(int i){
@@ -91,12 +102,14 @@ public class ComunicationControl {
 		if(!linker.conectionStatus()){
 			if(!quitRestarting){
 				quitRestarting = true;
+				isRestarting = true;
 				guiMenu.WarnMenu.warn.setAlarm(true, WARN_TYPE, "Re-Connecting");
 				debug.Debug.println("***RESTARTING COMUNICATION***", debug.Debug.MASSAGE);
 				Thread th = new Thread("restart"){
 					public void run(){
 						restart();
 						debug.Debug.println("Thread to restart: Stoped!");
+						isRestarting = false;
 					}
 				};
 				th.start();
@@ -147,7 +160,6 @@ public class ComunicationControl {
 			s=s.next;
 		}
 		if(deltaAbs>TIME_DELAY_ERR){
-			debug.Debug.println("* Error, Comunication broken! Delay "+deltaAbs+"ms",debug.Debug.ERROR);
 			handleLostPackage(max);
 		}else if(deltaAbs>TIME_DELAY_WARN && xlp1<=0){
 			debug.Debug.println("* Warning long Com-Delay ("+deltaAbs+"ms)",debug.Debug.WARN);
@@ -198,13 +210,18 @@ public class ComunicationControl {
 	
 	private void reciveMsg(String msg){
 		if(msg == null)return;
-		if(msg.contains("RESPONS")){
+		if(msg.contains("RESPONSE")){
 			lpTerminater = 0;
-			if(msg.length() <= 7){
+			if(LostPackageWarning){
+				LostPackageWarning = false;
+				WarnMenu.warn.setAlarm(false, WarnMenu.TYPE_CONNECTION, "Response is OK");
+			}
+			
+			if(msg.length() <= 8){
 				debug.Debug.println("* Communication Fault: RESPONSE was send empty!", debug.Debug.ERROR);
 			}
 			SendString s = sendString;
-			msg = msg.substring(0, msg.length()-7);
+			msg = msg.substring(0, msg.length()-8);
 			if(pendingPing){
 				if(msg.contains("PING") && msg.contains(""+pingId)){
 					pendingPing = false;
@@ -235,13 +252,21 @@ public class ComunicationControl {
 	
 	private void handleLostPackage(String s){
 		linker.send(s);
-		lpTerminater++;
+		if(s.contains("PING")){
+			lpTerminater++;
+			debug.Debug.println("* Error, Comunication broken! Delay "+deltaAbs+"ms",debug.Debug.ERROR);
+			debug.Debug.println("Lost count:"+lpTerminater+" Total loses:"+lostPacks, debug.Debug.SUBERR);
+		}else{
+			debug.Debug.println("* Resending MSG: "+s+"; Delta is"+deltaAbs+"ms",debug.Debug.ERROR);
+		}
 		lostPacks++;
-		debug.Debug.println("Lost count:"+lpTerminater+" Total loses:"+lostPacks, debug.Debug.SUBERR);
 		
-		if(lpTerminater >= 4){
-			linker.terminate();
-			return;
+		if(lpTerminater >= 2){
+			//linker.terminate();
+			if(!LostPackageWarning){
+				LostPackageWarning = true;
+				WarnMenu.warn.setAlarm(true, WARN_TYPE, "Waiting for Response...");
+			}
 		}
 		SendString st = sendString;
 		while(st != null){
@@ -254,6 +279,7 @@ public class ComunicationControl {
 		debug.Debug.println("* Process ERROR in ComunicationControle", debug.Debug.ERROR);
 	}
 	
+	@SuppressWarnings("static-access")
 	private void restart(){
 		linker.terminate();
 		
@@ -265,6 +291,7 @@ public class ComunicationControl {
 		}
 		
 		linker = new Linker();
+		guiMenu.WarnMenu.warn.setAlarm(true, WARN_TYPE, "Re-Connecting");
 		debug.Debug.println("Waiting for response...");
 		for (int i = 0; i < timeToWait*3; i++) {
 			try {
@@ -313,6 +340,52 @@ public class ComunicationControl {
 			s.time = t;
 			s = s.next;
 		}
+	}
+	
+	public void closeConnection(String s){
+		debug.Debug.println("* Connection is going to be closed! Reason:"+s, debug.Debug.WARN);
+		//TODO handel stop;
+		if(linker != null){
+			linker.terminate();
+		}
+	}
+	
+	public void changeTelemetrySendState(boolean b){
+		if(b == sendTelemetry)return;
+		sendTelemetry = b;
+		if(sendTelemetry){
+			debug.Debug.println("* Telemetry will be send again!", debug.Debug.MASSAGE);
+			send("E RS_Telem");
+		}else{
+			debug.Debug.println("* Telemetry will be STOPED!", debug.Debug.WARN);
+			send("E STOP_Telem");
+		}
+	}
+	
+	public void whipeSendStrings(){
+		debug.Debug.println("* Wiping Send Strings...", debug.Debug.WARN);
+		
+		sendString = null;
+		linker.whipe();
+		
+		pendingPing = false;
+	}
+	
+	public static boolean telemetrySendState(){
+		return sendTelemetry;
+	}
+	
+	public static boolean isRestarting(){
+		return isRestarting;
+	}
+	
+	public static void restartConnection(){
+		if(isRestarting){
+			debug.Debug.println("* WARNING! Restart is already happening!", debug.Debug.ERROR);
+			debug.Debug.println(" Restart of Linker is done twice, this may lead to malefunctions", debug.Debug.SUBERR);
+		}
+		
+		quitRestarting = false;
 	}
 
 }

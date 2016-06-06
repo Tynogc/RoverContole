@@ -36,7 +36,7 @@ public class MapView extends menu.AbstractMenu{
 	
 	public static Color progColor = new Color(50,250,50);
 	public static Color corrColor = new Color(200,0,250);
-	public static Color dirColor = new Color(20,0,200); 
+	public static Color dirColor = new Color(50,50,250); 
 	public static Color targetColor = new Color(200,150,0); 
 	public static Color viaColor = new Color(200,200,10);
 	public static Color disabledColor = new Color(185,120,90);

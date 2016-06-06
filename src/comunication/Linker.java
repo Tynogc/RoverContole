@@ -122,6 +122,12 @@ public class Linker extends Thread{
 			}
 		}
 		debug.Debug.println("* Comunication Thread Terminated!", debug.Debug.ERROR);
+		try {
+			if(soket != null)
+				soket.close();
+		} catch (IOException e) {
+			debug.Debug.println(e.toString(), debug.Debug.ERROR);
+		}
 		conectionAquiered = false;
 	}
 	
@@ -213,6 +219,19 @@ public class Linker extends Thread{
 		boolean b = threadIsRunning;
 		sema.release();
 		return b;
+	}
+	
+	public void whipe(){
+		try {
+			sema.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		while(upstream.contains())
+			upstream.out();
+		while (downstream.contains())
+			downstream.out();
+		sema.release();
 	}
 
 }

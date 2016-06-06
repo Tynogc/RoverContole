@@ -56,9 +56,6 @@ public class MainFrame extends Panel{
 	
 	private boolean startUpBoolean;
 	
-	private static GraphicsDevice device = 
-			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-	
 	private BufferedImage[] buffers;
 	private int bufferInUse;
 	

@@ -33,6 +33,7 @@ public class GuiControle {
 	public static guiMenu.WarnMenu warnMenu;
 	public static guiMenu.MapView mapMenu;
 	public static guiMenu.Telemetry telemetry;
+	public static guiMenu.Electric electric;
 	
 	public static menu.MenuControle shutdownMenu;
 	public static guiMenu.ShutdownMenu shutDoM;
@@ -90,6 +91,9 @@ public class GuiControle {
 		telemetry = new guiMenu.Telemetry(mapMenu);
 		debug.Debug.bootMsg("Telemetry", telemetry.getStatus());
 		
+		electric = new guiMenu.Electric();
+		debug.Debug.bootMsg("Electric", electric.getStatus());
+		
 		key.setBottomMenu(bo);
 		setSecondMenu(comMenu);
 		
@@ -104,6 +108,9 @@ public class GuiControle {
 	}
 	
 	public void uppdate(){
+		firstM.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
+		bottMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
+		
 		if(shutdownMenu != null && shutDoM != null){
 			shutdownMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
 			if(!shutDoM.stillActiv()){
@@ -111,14 +118,11 @@ public class GuiControle {
 				shutdownMenu = null;
 				debug.Debug.println("* ShutDown-Menu deleted", debug.Debug.COM);
 			}
-			mouse.leftClicked = false;
+		}else{
+			secondM.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
+			sideMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
+			logMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
 		}
-		
-		firstM.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
-		secondM.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
-		sideMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
-		bottMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
-		logMenu.mouseState(mouse.x+mouseXAdd, mouse.y+mouseYAdd, mouse.left || mouse.leftClicked, mouse.right);
 		
 		firstM.scrolled(mouse.rot);
 		secondM.scrolled(mouse.rot);

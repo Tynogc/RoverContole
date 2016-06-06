@@ -3,6 +3,8 @@ package guiMenu;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.io.PrintWriter;
 import javax.naming.CommunicationException;
 import javax.swing.ImageIcon;
 
+import comunication.ComunicationControl;
 import debug.Debug;
 import userInterface.KeySystem;
 import userInterface.MainFrame;
@@ -53,16 +56,21 @@ public class ComunicationMenu extends AbstractMenu{
 	private Button commDel;
 	private Button commSaveToFile;
 	
+	private Button enableDangerZone;
+	
 	private DataFiled comTextStatus;
 	private DataFiled comTextStatus2;
 	private DataFiled comTextStatus3;
 	
 	private Button reconect;
+	private Button noTelem;
+	private Button whipeIO;
+	private Button stopConection;
 	
 	private Font numbers;
 	private Font text;
 	
-	private ImageIcon[] ima;
+	private BufferedImage[] ima;
 	
 	private String filePath;
 	
@@ -75,11 +83,12 @@ public class ComunicationMenu extends AbstractMenu{
 		numbers = new Font(Font.DIALOG,Font.PLAIN, 10);
 		text = new Font(Font.DIALOG,Font.PLAIN, 12);
 		
-		ima = new ImageIcon[]{
-				new ImageIcon("res/win/sub/CD1.png"),
-				new ImageIcon("res/win/sub/CD2.png"),
-				new ImageIcon("res/win/sub/CD3.png"),
-				new ImageIcon("res/win/sub/CD4.png")
+		ima = new BufferedImage[]{
+				PicLoader.pic.getImage("res/win/sub/CD1.png"),
+				PicLoader.pic.getImage("res/win/sub/CD2.png"),
+				PicLoader.pic.getImage("res/win/sub/CD3.png"),
+				PicLoader.pic.getImage("res/win/sub/CD4.png"),
+				PicLoader.pic.getImage("res/win/gui/spb/aca/DangerZone.png")
 		};
 		
 		downLink = new String[arrayLenght];
@@ -317,17 +326,91 @@ public class ComunicationMenu extends AbstractMenu{
 		add(comTextStatus3);
 		comTextStatus3.setTextColor(Color.WHITE);
 		
-		reconect = new Button(600,100,"res/win/gui/spb/NEW") {//TODO
+		reconect = new Button(600,550,"res/win/gui/spb/Tra1") {
 			@Override
 			protected void uppdate() {}
 			@Override
 			protected void isFocused() {}
 			@Override
 			protected void isClicked() {
-				comunication.ComunicationControl.quitRestarting = false;
+				comunication.ComunicationControl.restartConnection();
 			}
 		};
+		reconect.setSubtext("Reconnect");
 		add(reconect);
+		
+		noTelem = new Button(700,550,"res/win/gui/spb/Tra2") {
+			private boolean itk = true;
+			@Override
+			protected void uppdate() {
+				if(itk == ComunicationControl.telemetrySendState()) return;
+				itk = !itk;
+				if(itk){
+					setSubtext("Stop Telemetry");
+				}else{
+					setSubtext("Restart Telemetry");
+				}
+			}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				ComunicationControl.com.changeTelemetrySendState(!itk);
+			}
+			@Override
+			public void paintYou(Graphics g){
+				super.paintYou(g);
+				if(itk)return;
+				g.setColor(Color.RED);
+				g.drawRect(xPos-1, yPos-1, xSize+2, ySize+2);
+				g.drawRect(xPos+3, yPos+3, xSize-6, ySize-6);
+			}
+		};
+		noTelem .setSubtext("Stop Telemetry");
+		add(noTelem);
+		
+		whipeIO = new Button(800,550,"res/win/gui/spb/Tra3") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				comunication.ComunicationControl.com.whipeSendStrings();
+			}
+		};
+		whipeIO .setSubtext("Wipe I/O");
+		add(whipeIO);
+		
+		stopConection = new Button(780,650,"res/win/gui/cli/Gsk") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				comunication.ComunicationControl.com.closeConnection("Manual Shutdown");
+			}
+		};
+		stopConection.setBig(false);
+		stopConection.setText("Disconect");
+		add(stopConection);
+		
+		stopConection.setDisabled(true);
+		noTelem.setDisabled(true);
+		reconect.setDisabled(true);
+		whipeIO.setDisabled(true);
+		
+		enableDangerZone = new Button(835,500,"res/win/gui/spb/aca/L") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+			}
+		};
+		add(enableDangerZone);
 		
 		changeCon = new comunication.ConnectionChange(600, 300, k);
 		
@@ -337,6 +420,43 @@ public class ComunicationMenu extends AbstractMenu{
 		add(changeCon.portText);
 		add(changeCon.save);
 		//debug.Debug.println(changeCon.save.getxSize()+" "+changeCon.save.getySize());
+		
+		Button ilc = new Button(600,100,"res/win/gui/cli/G") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				ComunicationControl.com.send("NULL");
+			}
+		};
+		ilc.setText("Send: NULL");
+		add(ilc);
+		Button ilb = new Button(600,140,"res/win/gui/cli/G") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				ComunicationControl.com.send("CHIP");
+			}
+		};
+		ilb.setText("Send: CHIP");
+		add(ilb);
+		Button ila = new Button(600,180,"res/win/gui/cli/G") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				ComunicationControl.com.send("# MARK");
+			}
+		};
+		ila.setText("Send: MARK");
+		add(ila);
 		
 		setUpLink(new String[]{
 				"***GPS***C124.234_L1254.43_H340_S10",
@@ -363,8 +483,34 @@ public class ComunicationMenu extends AbstractMenu{
 		vanishComm();
 	}
 	
+	private boolean reconectActiv = false;
+	private boolean noTelemActiv = false;
+	private boolean disconectActiv = false;
 	@Override
 	protected void uppdateIntern() {
+		boolean a = enableDangerZone.wasLastClicked();
+		boolean rcA = (ComunicationControl.connError&&!ComunicationControl.isRestarting()) || a;
+		boolean ntA = !ComunicationControl.telemetrySendState() || a;
+		if(a != disconectActiv){
+			disconectActiv = a;
+			stopConection.setDisabled(!a);
+			whipeIO.setDisabled(!a);
+			if(a)
+				enableDangerZone.setFilePath("res/win/gui/spb/aca/LC");
+			else
+				enableDangerZone.setFilePath("res/win/gui/spb/aca/L");
+			//debug.Debug.println("***TEST");
+		}
+		if(rcA != reconectActiv){
+			reconectActiv = rcA;
+			reconect.setDisabled(!rcA);
+		}
+		if(ntA != noTelemActiv){
+			noTelemActiv = ntA;
+			noTelem.setDisabled(!ntA);
+		}
+		
+		
 		if(doLiPos != doLiScro.getScrolled()){
 			doLiBuff = paintADataArray(downLink, doLiScro.getScrolled());
 			doLiPos = doLiScro.getScrolled();
@@ -382,14 +528,28 @@ public class ComunicationMenu extends AbstractMenu{
 
 	@Override
 	protected void paintIntern(Graphics g) {
+		g.drawImage(ima[4], 580, 500, null);
+		
+		Graphics2D g2d = (Graphics2D)g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setColor(Color.white);
+		g2d.setFont(Button.boldFont14);
+		g2d.drawString("DANGER ZONE", 630, 523);
+		g2d.setColor(Color.gray);
+		g2d.drawRect(580, 532, 295, 143);
+		g2d.setFont(Button.plainFont);
+		g.drawString("Reconnect", 600, 620);
+		g.drawString("Send Telem.", 700, 620);
+		g.drawString("Wipe I/O", 800, 620);
+		
 		g.drawImage(doLiBuff, 100, 120, null);
 		if(doLiIsRec){
-			g.drawImage(ima[(int)(MainThread.currentTime%500)/125].getImage(),350,242,null);
+			g.drawImage(ima[(int)(MainThread.currentTime%500)/125],350,242,null);
 		}
 		
 		g.drawImage(upLiBuff, 100, 320, null);
 		if(upLiIsRec){
-			g.drawImage(ima[(int)(MainThread.currentTime%500)/125].getImage(),350,442,null);
+			g.drawImage(ima[(int)(MainThread.currentTime%500)/125],350,442,null);
 		}
 		
 		g.drawImage(commBuff, 100, 520, null);

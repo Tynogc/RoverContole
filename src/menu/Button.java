@@ -205,6 +205,9 @@ public abstract class Button implements ButtonInterface {
 			focusOffsetX = 0;
 			focusOffsetY = 0;
 		}
+		
+		if(getySize()<3)setySize(10);
+		if(getxSize()<3)setxSize(10);
 	}
 	
 	public void setNext(ButtonInterface b){

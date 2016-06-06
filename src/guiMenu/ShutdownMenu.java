@@ -82,6 +82,15 @@ public class ShutdownMenu extends AbstractMenu{
 
 	@Override
 	protected void paintIntern(Graphics g) {
+		/*int q = tts-25000;
+		q /= 20;
+		q = 200-q;
+		if(q>200)q = 200;
+		if(q<0)q=0;
+		if(tts == 0)q = 0;
+		g.setColor(new Color(100,100,100,q));
+		g.fillRect(0, 0, MainFrame.frameX, MainFrame.frameY);*/
+		
 		g.setColor(Color.white);
 		g.setFont(Button.boldFont14);
 		g.drawString("Shutdown in "+tts/1000+" s", x, y+7);
