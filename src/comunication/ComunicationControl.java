@@ -38,7 +38,11 @@ public class ComunicationControl {
 	
 	public static ComunicationControl com;
 	
+	private CommAction action;
+	
 	public ComunicationControl(){
+		action = new CommAction();
+		
 		linker = new Linker();
 		
 		debug.Debug.println("Waiting for response - ");
@@ -231,7 +235,7 @@ public class ComunicationControl {
 			
 			while (s != null) {
 				if(s.text.compareToIgnoreCase(msg) == 0){
-					//TODO quitierung der nachricht bestätigen
+					//TODO quitierung der nachricht bestï¿½tigen
 					if(lastPingSend < s.time){
 						lastPingSend = s.time;
 					}
@@ -246,7 +250,7 @@ public class ComunicationControl {
 			debug.Debug.println("* Communication Fault: RESPONSE dosn't match to sendet String!", debug.Debug.WARN);
 			debug.Debug.println(" RESPONSE is: "+msg, debug.Debug.SUBWARN);
 		}else{
-			//TODO process
+			action.processString(msg);
 		}
 	}
 	
@@ -386,6 +390,14 @@ public class ComunicationControl {
 		}
 		
 		quitRestarting = false;
+	}
+	
+	public void enterDebugLink(String s){
+		debug.Debug.println("* ALARM Debug-Comand entered! "+s, debug.Debug.COMERR);
+		action.processString(s);
+		if(comMenu!=null){
+			comMenu.setDownLink(new String[]{s});
+		}
 	}
 
 }

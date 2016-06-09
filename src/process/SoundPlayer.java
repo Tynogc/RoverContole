@@ -47,7 +47,7 @@ public class SoundPlayer extends Thread{
 					debug.Debug.println("* Cant Play sound With id:"+soundToPlay, debug.Debug.WARN);
 					soundToPlay = -1;
 				}else{
-					playSound(sounds1[soundToPlay]);
+					//playSound(sounds1[soundToPlay]);
 					soundToPlay = -1;
 				}
 			}

@@ -39,6 +39,7 @@ public class WarnMenu extends menu.AbstractMenu{
 	public static final int TYPE_SYSTEM = 0;
 	public static final int TYPE_CONNECTION = 1;
 	public static final int TYPE_SYSTEM_THREADS = 2;
+	public static final int TYPE_ELEC_BATTERY = 3;
 	
 	public static WarnMenu warn = null;
 	
@@ -71,6 +72,7 @@ public class WarnMenu extends menu.AbstractMenu{
 		state[0] = new AlarmDataField(100, 100, 100, 40, normalCol, TYPE_SYSTEM);
 		state[1] = new AlarmDataField(100, 160, 100, 40, normalCol, TYPE_CONNECTION);
 		state[2] = new AlarmDataField(100, 220, 100, 40, normalCol, TYPE_SYSTEM_THREADS);
+		state[3] = new AlarmDataField(400, 220, 100, 40, normalCol, TYPE_ELEC_BATTERY);
 		
 		for (int i = 0; i < length; i++) {
 			textB[i] = "";
@@ -481,6 +483,8 @@ public class WarnMenu extends menu.AbstractMenu{
 			return "Connection";
 		case TYPE_SYSTEM_THREADS:
 			return "Sys Threads";
+		case TYPE_ELEC_BATTERY:
+			return "Battery";
 
 		default:
 			return "???";

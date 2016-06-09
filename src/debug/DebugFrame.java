@@ -11,6 +11,8 @@ import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 
+import comunication.ComunicationControl;
+
 public class DebugFrame extends JFrame{
 	
 	private DebPanel panel;
@@ -91,7 +93,12 @@ public class DebugFrame extends JFrame{
 				}
 				if(c == '\n'){
 					Debug.println(input, Debug.PRICOM);
-					DebugComand.operateComand(input);
+					if(input.substring(0, 2).compareTo("//")==0){
+						ComunicationControl.com.enterDebugLink(input.substring(2));
+					}else{
+						DebugComand.operateComand(input);
+					}
+					
 					input = "";
 				}else if((int)arg0.getKeyChar() == 8){
 					if(input.length()>=1)

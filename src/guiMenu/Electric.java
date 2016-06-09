@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import menu.AbstractMenu;
+import process.PowerSystem;
+import process.ProcessControl;
 
 public class Electric extends AbstractMenu{
 
@@ -12,9 +14,9 @@ public class Electric extends AbstractMenu{
 	
 	private BufferedImage[] acc;
 	
-	private static final int MAX_VOLTS = 420;//TODO richtig zuweisen
-	private static final int VOLTS_WARN = 340;//TODO richtig zuweisen
-	private static final int MIN_VOLTS = 310;//TODO richtig zuweisen
+	private final int MAX_VOLTS = PowerSystem.MAX_VOLTS;
+	private final int VOLTS_WARN = PowerSystem.VOLTS_WARN;
+	private final int MIN_VOLTS = PowerSystem.MIN_VOLTS;
 	private static final int DISABLED = 0;
 	
 	private Color cB;
@@ -27,9 +29,9 @@ public class Electric extends AbstractMenu{
 		imas[2] = PicLoader.pic.getImage("res/win/sub/ele/P2.png");
 		imas[3] = PicLoader.pic.getImage("res/win/sub/ele/P.png");
 		
-		acc = new BufferedImage[8];
+		acc = new BufferedImage[2];
 		for (int i = 0; i < acc.length; i++) {
-			acc[i]=new BufferedImage(261, 34, BufferedImage.TYPE_INT_ARGB);
+			acc[i]=new BufferedImage(261, 26*4, BufferedImage.TYPE_INT_ARGB);
 		}
 		
 		if(imas[1].getWidth()<11 || imas[2].getWidth()<11||imas[1].getHeight()<11 || imas[2].getHeight()<11){
@@ -46,9 +48,9 @@ public class Electric extends AbstractMenu{
 		g.drawImage(imas[0], x, y, null);
 		if(volt <= DISABLED)return;
 		int col = 0;
-		if(volt/mul<=VOLTS_WARN)col = 3;
+		if(volt<=VOLTS_WARN*mul)col = 3;
 		Telemetry.paintTelemetryInts(volt, 4, col, x+241, y+28, g,2);
-		double p = (double)((volt/mul)-MIN_VOLTS)/(MAX_VOLTS-MIN_VOLTS)*10;
+		double p = (double)(volt-MIN_VOLTS*mul)/(MAX_VOLTS*mul-MIN_VOLTS*mul)*10;
 		col++;
 		if(col == 4)col = 2;
 		for (int i = 0; i < 10; i++) {
@@ -75,14 +77,36 @@ public class Electric extends AbstractMenu{
 	
 	@Override
 	protected void uppdateIntern() {
+		if(ProcessControl.pow.wasUpdated){
+			ProcessControl.pow.wasUpdated = false;
+			
+			try {
+				upD();
+			} catch (ArrayIndexOutOfBoundsException e) {
+				debug.Debug.println("* Error ElectricGUI01: "+e.toString());
+			}
+		}
+	}
+	
+	private void upD() throws ArrayIndexOutOfBoundsException{
+		PowerSystem p = ProcessControl.pow;
 		
+		Graphics g = acc[0].getGraphics();
+		paintChargeBarSmall(0,0, p.akku1[1], g);
+		paintChargeBarSmall(0,26, p.akku1[2], g);
+		paintChargeBarSmall(0,52, p.akku1[3], g);
+		g = acc[1].getGraphics();
+		paintChargeBarSmall(0,0, p.akku2[1], g);
+		paintChargeBarSmall(0,26, p.akku2[2], g);
+		paintChargeBarSmall(0,52, p.akku2[3], g);
+		paintChargeBarSmall(0,78, p.akku2[4], g);
 	}
 
 	@Override
 	protected void paintIntern(Graphics g) {
-		paintChargeBar(40, 100, 1800-((int)(System.currentTimeMillis()/30)%900), g, 4);
-		paintChargeBar(40, 160, 440-((int)(System.currentTimeMillis()/100)%200), g, 1);
-		paintChargeBarSmall(40, 200, 440-((int)(System.currentTimeMillis()/100)%200), g);
+		paintChargeBar(40, 100, ProcessControl.pow.akku1[0], g, ProcessControl.pow.akku1.length-1);
+		//paintChargeBar(40, 160, 440-((int)(System.currentTimeMillis()/100)%200), g, 1);
+		g.drawImage(acc[0], 40, 134, null);
 	}
 	
 	
