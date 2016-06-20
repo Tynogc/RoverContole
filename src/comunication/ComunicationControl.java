@@ -38,10 +38,14 @@ public class ComunicationControl {
 	
 	public static ComunicationControl com;
 	
+	private boolean interuptSend;
+	
 	private CommAction action;
 	
 	public ComunicationControl(){
 		action = new CommAction();
+		
+		interuptSend = false;
 		
 		linker = new Linker();
 		
@@ -55,6 +59,7 @@ public class ComunicationControl {
 			if(linker.conectionStatus()) break;
 			printWait(i);
 		}
+		debug.Debug.println(linker.connectionPwAsked);
 		if(linker.conectionStatus()){
 			debug.Debug.println("Response: "+linker.getResponse());
 			debug.Debug.bootMsg("Server response!", 0);
@@ -174,6 +179,9 @@ public class ComunicationControl {
 	}
 	
 	public void send(String[] s){
+		if(interuptSend){
+			return;
+		}
 		if(comMenu!=null){
 			comMenu.setUpLink(s);
 		}
@@ -306,6 +314,7 @@ public class ComunicationControl {
 			if(linker.conectionStatus()) break;
 			//printWait(i);
 		}
+		debug.Debug.println(linker.connectionPwAsked);
 		if(linker.conectionStatus()){
 			debug.Debug.println("Response: "+linker.getResponse());
 			debug.Debug.bootMsg("Server response!", 0);
@@ -352,6 +361,7 @@ public class ComunicationControl {
 		if(linker != null){
 			linker.terminate();
 		}
+		quitRestarting = true;
 	}
 	
 	public void changeTelemetrySendState(boolean b){
@@ -397,6 +407,17 @@ public class ComunicationControl {
 		action.processString(s);
 		if(comMenu!=null){
 			comMenu.setDownLink(new String[]{s});
+		}
+	}
+	
+	public boolean getInterupt(){
+		return interuptSend;
+	}
+	
+	public void setIneruptSend(boolean b){
+		interuptSend = b;
+		if(!b){
+			pendingPing = false;
 		}
 	}
 

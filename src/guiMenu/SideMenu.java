@@ -6,15 +6,21 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
-import userInterface.MainFrame;
+import org.omg.CORBA.COMM_FAILURE;
 
+import process.PowerSystem;
+import process.ProcessControl;
+import process.SSK;
+import userInterface.MainFrame;
 import menu.AbstractMenu;
 import menu.Button;
+import menu.DataFiled;
 
 public class SideMenu extends AbstractMenu {
 	
 	private Button homeX;
 	private Button homeY;
+	private Button sskInt;
 	
 	private Button setMeter;
 	private Button setAbsolut;
@@ -36,6 +42,15 @@ public class SideMenu extends AbstractMenu {
 	private BufferedImage[] batt;
 	
 	private byte navPanelState;
+	
+	private DataFiled sskGes;
+	private DataFiled sskRes;
+	private DataFiled sskm1;
+	private DataFiled sskm2;
+	private DataFiled sskm3;
+	private DataFiled sskm4;
+	
+	private Color brown = new Color(185,122,87);
 	
 	public SideMenu(){
 		homeX  = new Button(MainFrame.sizeX-400,100,"res/win/gui/spb/HOMEX") {
@@ -62,6 +77,19 @@ public class SideMenu extends AbstractMenu {
 		};
 		add(homeY);
 		homeY.setSubtext("Home Y");
+		
+		sskInt  = new Button(MainFrame.sizeX-400,548,"res/win/gui/spb/SSKINT") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				comunication.ComunicationControl.com.send("*SSK_BREAK");
+			}
+		};
+		add(sskInt);
+		sskInt.setSubtext("Interupt SSK");
 		
 		setMeter = new Button(MainFrame.sizeX-400,70,"res/win/gui/cli/Gsk") {
 			@Override
@@ -124,6 +152,150 @@ public class SideMenu extends AbstractMenu {
 			}
 		}
 		
+		sskGes = new DataFiled(MainFrame.sizeX-330, 548, 150, 20, brown) {
+			private int i = -1;
+			@Override
+			protected void uppdate() {
+				if(i != ProcessControl.ssk.mc1){
+					i = ProcessControl.ssk.mc1;
+					setText(SSK.csP[i]);
+					if(i == 2){
+						setColor(Color.red);
+						setTextColor(Color.black);
+						setBlinking(false);
+					}else if(i == 0){
+						setColor(Color.blue);
+						setTextColor(Color.white);
+						setBlinking(false);
+					}else if(i == 3){
+						setColor(Color.cyan);
+						setTextColor(Color.black);
+						setBlinking(false);
+					}else if(i == 1){
+						setColor(Color.red);
+						setTextColor(Color.black);
+						setBlinking(true);
+					}
+				}
+			}
+			@Override
+			protected void isClicked() {}
+		};
+		add(sskGes);
+		sskRes = new DataFiled(MainFrame.sizeX-330+150, 548, 150, 20, brown) {
+			private int i = -1;
+			@Override
+			protected void uppdate() {
+				if(i != ProcessControl.ssk.mc2){
+					i = ProcessControl.ssk.mc2;
+					setText(SSK.csQ[i]);
+					if(i == 0){
+						setColor(Color.RED);
+						setTextColor(Color.black);
+						setBlinking(false);
+					}else if(i == 2){
+						setColor(Color.green);
+						setTextColor(Color.black);
+						setBlinking(true);
+					}else if(i == 1){
+						setColor(Color.green);
+						setTextColor(Color.black);
+						setBlinking(false);
+					}else if(i == 3){
+						setColor(Color.blue);
+						setBlinking(false);
+					}
+				}
+			}
+			@Override
+			protected void isClicked() {}
+		};
+		add(sskRes);
+		sskm1 = new DataFiled(MainFrame.sizeX-330, 568, 75, 20, brown) {
+			private int i = -1;
+			@Override
+			protected void uppdate() {
+				if(i != ProcessControl.ssk.getM1()){
+					i = ProcessControl.ssk.getM1();
+					setText(SSK.cs1[i]);
+					if(i == 0){
+						setColor(brown);
+					}else if(i == 1){
+						setColor(Color.green);
+					}else{
+						setColor(Color.red);
+					}
+				}
+				setBlinking(ProcessControl.ssk.getActiv(0));
+			}
+			@Override
+			protected void isClicked() {}
+		};
+		add(sskm1);
+		sskm2 = new DataFiled(MainFrame.sizeX-330+75, 568, 75, 20, brown) {
+			private int i = -1;
+			@Override
+			protected void uppdate() {
+				if(i != ProcessControl.ssk.getM2()){
+					i = ProcessControl.ssk.getM2();
+					setText(SSK.cs2[i]);
+					if(i == 0){
+						setColor(brown);
+					}else if(i == 1){
+						setColor(Color.green);
+					}else{
+						setColor(Color.red);
+					}
+				}
+				setBlinking(ProcessControl.ssk.getActiv(1));
+			}
+			@Override
+			protected void isClicked() {}
+		};
+		add(sskm2);
+		sskm3 = new DataFiled(MainFrame.sizeX-330+150, 568, 75, 20, brown) {
+			private int i = -1;
+			@Override
+			protected void uppdate() {
+				if(i != ProcessControl.ssk.getM3()){
+					i = ProcessControl.ssk.getM3();
+					setText(SSK.cs3[i]);
+					if(i == 0){
+						setColor(brown);
+					}else if(i == 1){
+						setColor(Color.green);
+					}else{
+						setColor(Color.red);
+					}
+				}
+				setBlinking(ProcessControl.ssk.getActiv(2));
+			}
+			@Override
+			protected void isClicked() {}
+		};
+		add(sskm3);
+		sskm4 = new DataFiled(MainFrame.sizeX-330+225, 568, 75, 20, brown) {
+			private int i = -1;
+			@Override
+			protected void uppdate() {
+				if(i != ProcessControl.ssk.getM4()){
+					i = ProcessControl.ssk.getM4();
+					setText(SSK.cs4[i]);
+					if(i == 0){
+						setColor(brown);
+					}else if(i == 1){
+						setColor(Color.green);
+					}else{
+						setColor(Color.red);
+					}
+				}
+				setBlinking(ProcessControl.ssk.getActiv(3));
+			}
+			@Override
+			protected void isClicked() {}
+		};
+		add(sskm4);
+		
 		entitys = new BufferedImage[]{
 				guiMenu.PicLoader.pic.getImage("res/win/sub/aw1.png"),
 				guiMenu.PicLoader.pic.getImage("res/win/sub/aw2.png"),
@@ -144,7 +316,7 @@ public class SideMenu extends AbstractMenu {
 		makeBack(buffY, 14459, 4, false);
 		makeBack(buffAlt, 33025, 0, false);
 		
-		makeVolts(142, 0, energy, true);
+		makeVolts(142, 0, 0, energy, true, true);
 	}
 	
 	private void makeBack(BufferedImage bu, int num, int color,boolean green){
@@ -198,7 +370,7 @@ public class SideMenu extends AbstractMenu {
 		}
 	}
 	
-	private void makeVolts(int volt, int voltStatus, BufferedImage bu, boolean disabled){
+	private void makeVolts(int volt, int voltStatus, int voltStatus2, BufferedImage bu, boolean disabled, boolean disabled2){
 		Graphics g = bu.getGraphics();
 		g.drawImage(entitys[3], 0,0,null);
 		
@@ -213,15 +385,29 @@ public class SideMenu extends AbstractMenu {
 			g.drawImage(smalNums[(volt/10)%10][kap], 26, 2, null);
 			g.drawImage(smalNums[volt%10][kap], 52, 2, null);
 			
-			if(voltStatus < batt.length){
+			if(voltStatus >= 0){
+				if(voltStatus >= batt.length)voltStatus = batt.length-1;
 				g.drawImage(batt[voltStatus],101,0,null);
 			}
 		}
+		
+		if(!disabled2 && voltStatus2 >= 0){
+			if(voltStatus2 >= batt.length)voltStatus2 = batt.length-1;
+			g.drawImage(batt[voltStatus2],133,0,null);
+		}
 	}
 
+	private int batCheckSumm = -100;
 	@Override
 	protected void uppdateIntern() {
 		redrawGPSstatus();
+		
+		int imu = PowerSystem.volt1*1000+PowerSystem.volt2;
+		if(imu != batCheckSumm){
+			batCheckSumm = imu;
+			makeVolts(PowerSystem.volt1/10, PowerSystem.voltBar1, PowerSystem.voltBar2, energy, 
+					PowerSystem.volt1 <= PowerSystem.DISABLED, PowerSystem.volt2 <= PowerSystem.DISABLED);
+		}
 	}
 
 	@Override

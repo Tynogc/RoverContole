@@ -3,6 +3,8 @@ package guiMenu;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import comunication.ComunicationControl;
+
 import debug.Debug;
 import userInterface.GuiControle;
 import userInterface.MainFrame;
@@ -22,9 +24,16 @@ public class BottomMenu extends menu.AbstractMenu{
 	
 	private Button prog;
 	
+	private Button reset;
+	
+	private Button jog;
+	
 	private Button settings;
 	
 	private DataFiled looker;
+	
+	private int fKeyMarker;
+	private long fKeyMarkerT;
 	
 	public BottomMenu() {
 		
@@ -103,7 +112,7 @@ public class BottomMenu extends menu.AbstractMenu{
 		add(tele);
 		tele.setSubtext("Telemetry");
 		
-		prog = new Button(500,MainFrame.sizeY-120,"res/win/gui/spb/COMMENU") {
+		prog = new Button(500,MainFrame.sizeY-120,"res/win/gui/spb/COMM") {
 			@Override
 			protected void uppdate() {
 			}
@@ -118,7 +127,7 @@ public class BottomMenu extends menu.AbstractMenu{
 		add(prog);
 		prog.setSubtext("Programming Menu");
 		
-		settings = new Button(740,MainFrame.sizeY-120,"res/win/gui/spb/settings") {
+		jog = new Button(620,MainFrame.sizeY-120,"res/win/gui/spb/COMM") {
 			@Override
 			protected void uppdate() {
 			}
@@ -127,13 +136,43 @@ public class BottomMenu extends menu.AbstractMenu{
 			}
 			@Override
 			protected void isClicked() {
-				GuiControle.setSecondMenu(GuiControle.settingsMenu);
+				B_Jog();
+			}
+		};
+		add(jog);
+		jog.setSubtext("Jog Menu");
+		
+		settings = new Button(860,MainFrame.sizeY-120,"res/win/gui/spb/settings") {
+			@Override
+			protected void uppdate() {
+			}
+			@Override
+			protected void isFocused() {
+			}
+			@Override
+			protected void isClicked() {
+				B_Settings();
 			}
 		};
 		add(settings);
 		settings.setSubtext("Settings");
 		
-		looker = new DataFiled(2,MainFrame.sizeY-160,600,20,Color.blue) {
+		reset = new Button(740,MainFrame.sizeY-120,"res/win/gui/spb/RESET") {
+			@Override
+			protected void uppdate() {
+			}
+			@Override
+			protected void isFocused() {
+			}
+			@Override
+			protected void isClicked() {
+				B_Reset();
+			}
+		};
+		add(reset);
+		reset.setSubtext("SSK Reset");
+		
+		looker = new DataFiled(2,MainFrame.sizeY-160,990,20,Color.blue) {
 			@Override
 			protected void uppdate() {
 			}
@@ -164,9 +203,17 @@ public class BottomMenu extends menu.AbstractMenu{
 		g.drawString("F3", 300, MainFrame.sizeY-5);
 		g.drawString("F2", 180, MainFrame.sizeY-5);
 		g.drawString("F1", 60, MainFrame.sizeY-5);
+		
+		if(System.currentTimeMillis()-fKeyMarkerT <600){
+			g.setColor(new Color(70,70,255,250-(int)(System.currentTimeMillis()-fKeyMarkerT)/3));
+			g.drawRect(19+(120*(fKeyMarker-1)), MainFrame.sizeY-121, 102, 102);
+			g.drawRect(18+(120*(fKeyMarker-1)), MainFrame.sizeY-122, 104, 104);
+		}
 	}
 	
 	public void fKeyPressed(int key){
+		fKeyMarker = key;
+		fKeyMarkerT = System.currentTimeMillis();
 		switch (key) {
 		case 5:
 			B_ProgMenu();
@@ -183,6 +230,15 @@ public class BottomMenu extends menu.AbstractMenu{
 		case 4:
 			B_runStop();
 			break;
+		case 8:
+			B_Settings();
+			break;
+		case 7:
+			B_Reset();
+			break;
+		case 6:
+			B_Jog();
+			break;
 
 		default:
 			break;
@@ -194,7 +250,9 @@ public class BottomMenu extends menu.AbstractMenu{
 		if(run.isVisible()){
 			run.setVisible(false);
 			stop.setVisible(true);
+			ComunicationControl.com.send("*RUN");
 		}else{
+			ComunicationControl.com.send("*STOP");
 			run.setVisible(true);
 			stop.setVisible(false);
 		}
@@ -210,6 +268,16 @@ public class BottomMenu extends menu.AbstractMenu{
 	}
 	private void B_Telem(){
 		GuiControle.setSecondMenu(GuiControle.telemetry);
+	}
+	private void B_Settings(){
+		GuiControle.setSecondMenu(GuiControle.settingsMenu);
+	}
+	private void B_Reset(){
+		ComunicationControl.com.send("*SSK_RES");
+	}
+	
+	private void B_Jog(){
+		
 	}
 
 

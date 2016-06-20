@@ -6,16 +6,26 @@ public class DebugComand {
 	private static boolean system;
 	private static boolean debug;
 	
-	private static int trueFalseMark = 0;
-	
 	private static boolean printDevidedCom = true;
 	
-	public static void operateComand(String s){
+	private static String st;
+	private static DebugFrame dt;
+	
+	public static void operateComand(String s, DebugFrame d){
+		st = s;
+		dt = d;
+		
+		Thread th = new Thread(){
+			public void run() {
+				operateC(st, dt);
+			};
+		};
+		th.setPriority(2);
+		th.start();
+	}
+	
+	private static void operateC(String s, DebugFrame d){
 		if(s.length()==0)return;
-		if(trueFalseMark != 0){
-			operateTrueFalseMark(s);
-			return;
-		}
 		String[][] str = devideComand(s);
 		if(s.charAt(0)=='F'){
 			return;
@@ -24,7 +34,7 @@ public class DebugComand {
 			return;
 		}
 		if(s.charAt(0)=='*'){
-			inSystem(str);
+			inSystem(str, d);
 			return;
 		}
 		if(s.charAt(0)=='<'&&s.charAt(s.length()-1)=='>'){
@@ -32,8 +42,7 @@ public class DebugComand {
 		}
 	}
 	
-	private static void inSystem(String[][] s){
-		System.out.println(s);
+	private static void inSystem(String[][] s, DebugFrame d){
 		if(s[1][0].compareToIgnoreCase("ramDet")== 0){
 			Runtime r = Runtime.getRuntime();
 			long a = r.freeMemory();
@@ -69,8 +78,10 @@ public class DebugComand {
 			return;
 		}
 		if(s[1][0].compareToIgnoreCase("stop")== 0){
-			Debug.println("Do you want to Stop the Program? [j]/[n]", Debug.COM);
-			trueFalseMark = 4567;
+			Debug.println("* Do you want to stop the Programm? [y/N]", Debug.COM);
+			if(question(false, d)){
+				System.exit(0);
+			}
 			return;
 		}
 		if(s[1][0].compareToIgnoreCase("info")== 0){
@@ -83,30 +94,31 @@ public class DebugComand {
 		if(s[1][0].compareToIgnoreCase("graphic")== 0){
 			
 		}
+		if(s[1][0].compareToIgnoreCase("crash")== 0){
+			Debug.println("* This operation crashes the System, Continue? [y/N]", Debug.COM);
+			if(question(false, d)){
+				Debug.println("* This is Dangerous! Are You sure? [y/N]", Debug.COMERR);
+				if(question(false, d)){
+					process.ProcessControl.pow = null;
+				}
+			}
+		}
 		if(s[1][0].compareToIgnoreCase("cursor")== 0){
 			DebGraphic.processCursor(s);
 		}
-	}
-	
-	private static void operateTrueFalseMark(String s){
-		boolean operTF = false;
-		if(s.compareTo("j") == 0){
-			operTF = true;
+		if(s[1][0].compareToIgnoreCase("PW")== 0){
+			d.setPwState(true);
+			Debug.println("* Enter Password:", Debug.SUBCOM);
 		}
-		switch (trueFalseMark) {
-		case 4567:
-			if(operTF){
-				Debug.println("Stopping Threads...", Debug.ERROR);
-				
-			}else{
-				Debug.println("Cancled", Debug.COMERR);
-			}
-			break;
-
-		default:
-			break;
+		if(s[1][0].compareToIgnoreCase("help")== 0){
+			Debug.println("List of Commands:", Debug.COM);
+			Debug.println("  *pw ", Debug.SUBCOM);Debug.print("Change the Connection Password", Debug.PRICOM);
+			Debug.println("  *gc ", Debug.SUBCOM);Debug.print("Runns the Garbage Collector", Debug.PRICOM);
+			Debug.println("  *ram ", Debug.SUBCOM);Debug.print("Ram Satus", Debug.PRICOM);
+			Debug.println("  *ramDet ", Debug.SUBCOM);Debug.print("Detailed Ram Satus", Debug.PRICOM);
+			Debug.println("  *stop ", Debug.SUBCOM);Debug.print("Stops the System", Debug.PRICOM);
+			Debug.println("  *crash ", Debug.SUBCOM);Debug.print("Forces a System Error", Debug.PRICOM);
 		}
-		trueFalseMark = 0;
 	}
 	
 	private static String[][] devideComand(String com){
@@ -166,6 +178,43 @@ public class DebugComand {
 		} catch (Exception e) {
 			Debug.println("Can't convert "+s+"to a number :(", Debug.COMERR);
 			return 0;
+		}
+	}
+	
+	public static boolean question(boolean enter, DebugFrame frame){
+		boolean t = qute(enter, frame);
+		frame.setCheckState(false);
+		if(t){
+			Debug.println("* YES", Debug.PRICOM);
+		}else{
+			Debug.println("* NO", Debug.PRICOM);
+		}
+		return t;
+	}
+	private static boolean qute(boolean enter, DebugFrame frame){
+		frame.setCheckState(true);
+		
+		while (true){
+			switch (frame.canState()) {
+			case 0:
+				try {
+					Thread.currentThread().sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				break;
+				
+			case 1:
+				return true;
+			case 2:
+				return false;
+			case 3:
+				return enter;
+
+			default:
+				break;
+			}
+			
 		}
 	}
 

@@ -24,8 +24,15 @@ public class DebugFrame extends JFrame{
 	
 	private byte canState;
 	private boolean checkState;
+	private boolean pwState;
+	private String pwString = "";
 	
 	public static int dfl = -280;
+	
+	private String[] omtc;
+	private int omtcPos = -1;
+	
+	private DebugFrame dbf;
 	
 	public DebugFrame(){
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -41,6 +48,14 @@ public class DebugFrame extends JFrame{
 		setFocusable(true);
 		canState = 0;
 		checkState = false;
+		pwState = false;
+		
+		dbf = this;
+		
+		omtc = new String[10];
+		for (int i = 0; i < omtc.length; i++) {
+			omtc[i] = "";
+		}
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
@@ -90,13 +105,33 @@ public class DebugFrame extends JFrame{
 					if(c == 'n') canState = 2;
 					
 					return;
+				}else if(pwState){
+					if(c == '\n'){
+						canState = 1;
+						comunication.FingerPrint.setPW(pwString);
+						pwString = "";
+						input = "";
+						pwState = false;
+					}else if((int)arg0.getKeyChar() == 8){
+						if(pwString.length()>=1)pwString=pwString.substring(0, pwString.length()-1);
+						if(input.length()>=1)input = input.substring(0, input.length()-1);
+					}else{
+						pwString += c;
+						input += "*";
+					}
+					panel.input = input;
+					panel.paint(panel.getGraphics());
+					
+					return;
 				}
+				omtcPos = -1;
 				if(c == '\n'){
+					addOmtcString(input);
 					Debug.println(input, Debug.PRICOM);
 					if(input.substring(0, 2).compareTo("//")==0){
 						ComunicationControl.com.enterDebugLink(input.substring(2));
 					}else{
-						DebugComand.operateComand(input);
+						DebugComand.operateComand(input, dbf);
 					}
 					
 					input = "";
@@ -106,6 +141,7 @@ public class DebugFrame extends JFrame{
 				}else{
 					input += c;
 				}
+				
 				panel.input = input;
 				panel.paint(panel.getGraphics());
 			}
@@ -117,7 +153,20 @@ public class DebugFrame extends JFrame{
 			
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-				
+				if(arg0.getKeyCode() == KeyEvent.VK_UP){
+					omtcPos++;
+					if(omtcPos>=omtc.length)omtcPos = omtc.length-1;
+					input = omtc[omtcPos];
+					panel.input = input;
+					panel.paint(panel.getGraphics());
+				}
+				if(arg0.getKeyCode() == KeyEvent.VK_DOWN){
+					omtcPos--;
+					if(omtcPos<0)omtcPos = 0;
+					input = omtc[omtcPos];
+					panel.input = input;
+					panel.paint(panel.getGraphics());
+				}
 			}
 		});
 		setVisible(true);
@@ -127,11 +176,26 @@ public class DebugFrame extends JFrame{
 	
 	public void setCheckState(boolean state){
 		checkState = state;
+		pwState = false;
+		canState = 0;
+	}
+	
+	public void setPwState(boolean state){
+		checkState = false;
+		pwState = state;
+		pwString = "";
 		canState = 0;
 	}
 	
 	public byte canState(){
 		return canState;
+	}
+	
+	private void addOmtcString(String s){
+		for (int i = omtc.length-2; i >= 0; i--) {
+			omtc[i+1]=omtc[i];
+		}
+		omtc[0] = s.substring(0);
 	}
 
 }

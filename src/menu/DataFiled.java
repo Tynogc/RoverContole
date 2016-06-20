@@ -14,6 +14,8 @@ public abstract class DataFiled extends Button{
 	public static final Color l2 = new Color(70,70,70);
 	private static final Color l3 = new Color(0,0,0,100);
 	
+	private boolean blinking = false;
+	
 	public DataFiled(int x, int y, int wi, int hi, Color c) {
 		super(x, y, wi, hi);
 		col = c;
@@ -37,6 +39,7 @@ public abstract class DataFiled extends Button{
 	}
 	
 	public void paintYou(Graphics g){
+		boolean bli = blinking && System.currentTimeMillis()/500%2 == 0;
 		if(disabled){
 			g.setFont(font);
 			g.setColor(textColor);
@@ -45,6 +48,8 @@ public abstract class DataFiled extends Button{
 			g.drawRect(xPos, yPos, xSize, ySize);
 		}else{
 			g.setColor(col);
+			if(bli)
+				g.setColor(textColor);
 			g.fillRect(xPos, yPos, xSize, ySize);
 			g.setColor(l1);
 			g.drawRect(xPos, yPos, xSize, ySize);
@@ -56,6 +61,8 @@ public abstract class DataFiled extends Button{
 			
 			g.setFont(font);
 			g.setColor(textColor);
+			if(bli)
+				g.setColor(col);
 			//g.drawString(text, xPos+offsettext+2, yPos+(ySize/2)+5);
 			if(subtext2 != null){
 				g.drawString(text, xPos+offsettext, yPos+(ySize/2));
@@ -68,6 +75,14 @@ public abstract class DataFiled extends Button{
 		next.paintYou(g);
 	}
 	
+	public boolean isBlinking() {
+		return blinking;
+	}
+
+	public void setBlinking(boolean blinking) {
+		this.blinking = blinking;
+	}
+
 	public void setData(String s){
 		setText(s);
 	}

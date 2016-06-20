@@ -25,6 +25,8 @@ public class Linker extends Thread{
 	
 	private boolean conectionAquiered;
 	
+	public String connectionPwAsked = "No Pw Asked!";
+	
 	private boolean threadIsRunning;
 	
 	private Scanner sc;
@@ -71,14 +73,35 @@ public class Linker extends Thread{
 		try {
 			sc = new Scanner(soket.getInputStream());
 			out = new PrintWriter( soket.getOutputStream(), true );
-			out.println("Hello");
+			out.println("TKE");
 			
 			response = sc.nextLine();
 		} catch (IOException e) {
 			response = e.toString();
+			return;
 		}catch (NoSuchElementException e) {
 			response = "No Line Found, Socket closed!";
+			return;
 		}
+		if(sc != null && out != null){
+			String s = sc.nextLine();
+			int i = 0;
+			try {
+				i = Integer.parseInt(s);
+			} catch (Exception e) {
+				response = "Conversion Failed";
+				return;
+			}
+			FingerPrint fp = new FingerPrint();
+			out.println(fp.getFingerprintAt(i));
+			s = sc.nextLine();
+			connectionPwAsked = "Result: "+s+" With Number "+i;
+			if(! s.contains("TRUSTY")){
+				response = "Not Trusty";
+				return;
+			}
+		}
+		
 		try {
 			sema.acquire();
 		} catch (InterruptedException e) {

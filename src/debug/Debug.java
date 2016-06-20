@@ -10,6 +10,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.concurrent.Semaphore;
 
@@ -24,6 +26,8 @@ public class Debug {
 	public static final int ERROR = 10;
 	public static final int SUBERR = 11;
 	
+	public static final int FATAL = 96;
+	
 	public static final int COM = 30;
 	public static final int SUBCOM = 31;
 	public static final int COMERR = 32;
@@ -31,6 +35,8 @@ public class Debug {
 	
 	public static final int WARN = 41;
 	public static final int SUBWARN = 42;
+	
+	public static final int REMOTE = 77;
 	
 	public static final int MASSAGE = 80;
 	
@@ -355,6 +361,10 @@ public class Debug {
 		
 		case MASSAGE: return new Color(0,180,0);
 		
+		case FATAL: return new Color(250,11,255);
+		
+		case REMOTE: return new Color(188,167,237);
+		
 		case TEXT: return Color.white;
 		}
 		return Color.darkGray;
@@ -375,7 +385,11 @@ public class Debug {
 		
 		case MASSAGE: return "[--]";
 		
+		case FATAL: return "[XX]";
+		
 		case TEXT: return "[--]";
+		
+		case REMOTE: return"[re]";
 		}
 		return "[??]";
 	}
@@ -494,5 +508,37 @@ public class Debug {
 	
 	public static void print(String s){
 		print(s,TEXT);
+	}
+	
+	public static void printExeption(Exception e){
+		PrintStream p = new PrintStream(new OutputStream() {
+			
+			@Override
+			public void write(int b) throws IOException {
+				
+			}
+		}){
+			@Override
+			public void print(String s) {
+				Debug.print(s, ERROR);
+				super.print(s);
+			}
+			@Override
+			public void println(String s) {
+				Debug.println(s, ERROR);
+				super.println(s);
+			}
+			@Override
+			public void println(char[] x) {
+				Debug.println(String.copyValueOf(x), ERROR);
+				super.println(x);
+			}
+			public void print(char[] x) {
+				Debug.print(String.copyValueOf(x), ERROR);
+				super.print(x);
+			}
+		};
+		
+		e.printStackTrace(p);
 	}
 }

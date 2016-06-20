@@ -33,6 +33,8 @@ public class StartUp {
 	}
 	
 	private void gtt(){
+		debug.Debug.println("* Enter Password:");
+		pw();
 		debug.Debug.println("* Quick StartUp? [Y|n]");
 		if(question(true)) return;
 		debug.Debug.println("* Full Screen? [Y|n]");
@@ -53,6 +55,18 @@ public class StartUp {
 			debug.Debug.println("* Play simplyfied Version instead? [Y|n]");
 			playIntroSimple = question(true);
 		}
+	}
+	
+	public void pw(){
+		frame.setPwState(true);
+		while(frame.canState()==0){
+			try {
+				Thread.currentThread().sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		frame.setPwState(false);
 	}
 	
 	public boolean question(boolean enter){

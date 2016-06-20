@@ -31,7 +31,13 @@ public class MainThread extends Thread{
 			currFps++;
 			
 			currentTime = System.currentTimeMillis();
-			frame.loop(lastFPS, sleepTime,(int)frameTimeOVAsmal, (int)frameTimeOVA);
+			try {
+				frame.loop(lastFPS, sleepTime,(int)frameTimeOVAsmal, (int)frameTimeOVA);
+			} catch (Exception e) {
+				debug.Debug.println("* FATAL: Uncatched Error!", debug.Debug.FATAL);
+				debug.Debug.printExeption(e);
+				isRunning = false;
+			}
 			
 			//FPS uberprufen
 			if(currentTime-fpsMarker>500){
@@ -57,6 +63,23 @@ public class MainThread extends Thread{
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+			}
+		}
+		isRunning = true;
+		sleepTime = 15;
+		debug.Debug.println("* Restoring to save Mode", debug.Debug.FATAL);
+		while (isRunning) {
+			frame.saveLoop();
+			
+			sleepTime--;
+			try {
+				sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			debug.Debug.print("-");
+			if(sleepTime < 0){
+				System.exit(-1);
 			}
 		}
 	}

@@ -65,6 +65,7 @@ public class ComunicationMenu extends AbstractMenu{
 	private Button reconect;
 	private Button noTelem;
 	private Button whipeIO;
+	private Button interuptCom;
 	private Button stopConection;
 	
 	private Font numbers;
@@ -75,6 +76,8 @@ public class ComunicationMenu extends AbstractMenu{
 	private String filePath;
 	
 	private comunication.ConnectionChange changeCon;
+	
+	private BufferedImage connInfo;
 
 	public ComunicationMenu(KeySystem k){
 		filePath = "log/com/"+
@@ -333,6 +336,7 @@ public class ComunicationMenu extends AbstractMenu{
 			protected void isFocused() {}
 			@Override
 			protected void isClicked() {
+				comunication.ComunicationControl.com.closeConnection("Restart");
 				comunication.ComunicationControl.restartConnection();
 			}
 		};
@@ -369,7 +373,30 @@ public class ComunicationMenu extends AbstractMenu{
 		noTelem .setSubtext("Stop Telemetry");
 		add(noTelem);
 		
-		whipeIO = new Button(800,550,"res/win/gui/spb/Tra3") {
+		interuptCom = new Button(800,550,"res/win/gui/spb/Tra3") {
+			private boolean itk = true;
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				itk = !itk;
+				comunication.ComunicationControl.com.setIneruptSend(!itk);
+			}
+			@Override
+			public void paintYou(Graphics g){
+				super.paintYou(g);
+				if(itk)return;
+				g.setColor(Color.RED);
+				g.drawRect(xPos-1, yPos-1, xSize+2, ySize+2);
+				g.drawRect(xPos+3, yPos+3, xSize-6, ySize-6);
+			}
+		};
+		interuptCom .setSubtext("Interupt Com");
+		add(interuptCom);
+		
+		whipeIO = new Button(680,650,"res/win/gui/cli/Gsk") {
 			@Override
 			protected void uppdate() {}
 			@Override
@@ -379,7 +406,8 @@ public class ComunicationMenu extends AbstractMenu{
 				comunication.ComunicationControl.com.whipeSendStrings();
 			}
 		};
-		whipeIO .setSubtext("Wipe I/O");
+		whipeIO.setBig(false);
+		whipeIO.setText("Wipe IO");
 		add(whipeIO);
 		
 		stopConection = new Button(780,650,"res/win/gui/cli/Gsk") {
@@ -400,6 +428,7 @@ public class ComunicationMenu extends AbstractMenu{
 		noTelem.setDisabled(true);
 		reconect.setDisabled(true);
 		whipeIO.setDisabled(true);
+		interuptCom.setDisabled(true);
 		
 		enableDangerZone = new Button(835,500,"res/win/gui/spb/aca/L") {
 			@Override
@@ -421,7 +450,7 @@ public class ComunicationMenu extends AbstractMenu{
 		add(changeCon.save);
 		//debug.Debug.println(changeCon.save.getxSize()+" "+changeCon.save.getySize());
 		
-		Button ilc = new Button(600,100,"res/win/gui/cli/G") {
+		/*Button ilc = new Button(600,100,"res/win/gui/cli/G") {
 			@Override
 			protected void uppdate() {}
 			@Override
@@ -456,7 +485,11 @@ public class ComunicationMenu extends AbstractMenu{
 			}
 		};
 		ila.setText("Send: MARK");
-		add(ila);
+		add(ila);*/
+		
+		upLiDat.setTextColor(Color.white);
+		doLiDat.setTextColor(Color.white);
+		commDat.setTextColor(Color.white);
 		
 		setUpLink(new String[]{
 				"***GPS***C124.234_L1254.43_H340_S10",
@@ -485,12 +518,14 @@ public class ComunicationMenu extends AbstractMenu{
 	
 	private boolean reconectActiv = false;
 	private boolean noTelemActiv = false;
+	private boolean interuptActiv = false;
 	private boolean disconectActiv = false;
 	@Override
 	protected void uppdateIntern() {
 		boolean a = enableDangerZone.wasLastClicked();
 		boolean rcA = (ComunicationControl.connError&&!ComunicationControl.isRestarting()) || a;
 		boolean ntA = !ComunicationControl.telemetrySendState() || a;
+		boolean itA = ComunicationControl.com.getInterupt() || a;
 		if(a != disconectActiv){
 			disconectActiv = a;
 			stopConection.setDisabled(!a);
@@ -508,6 +543,10 @@ public class ComunicationMenu extends AbstractMenu{
 		if(ntA != noTelemActiv){
 			noTelemActiv = ntA;
 			noTelem.setDisabled(!ntA);
+		}
+		if(itA != interuptActiv){
+			interuptActiv = itA;
+			interuptCom.setDisabled(!itA);
 		}
 		
 		
@@ -539,8 +578,8 @@ public class ComunicationMenu extends AbstractMenu{
 		g2d.drawRect(580, 532, 295, 143);
 		g2d.setFont(Button.plainFont);
 		g.drawString("Reconnect", 600, 620);
-		g.drawString("Send Telem.", 700, 620);
-		g.drawString("Wipe I/O", 800, 620);
+		g.drawString("Silent", 700, 620);
+		g.drawString("Interupt", 800, 620);
 		
 		g.drawImage(doLiBuff, 100, 120, null);
 		if(doLiIsRec){
@@ -553,6 +592,10 @@ public class ComunicationMenu extends AbstractMenu{
 		}
 		
 		g.drawImage(commBuff, 100, 520, null);
+		
+		if(connInfo != null){
+			g.drawImage(connInfo, 600, 100, null);
+		}
 	}
 	
 	private BufferedImage paintADataArray(String[] s, int pos){
@@ -767,34 +810,60 @@ public class ComunicationMenu extends AbstractMenu{
 		commPos = -10;
 	}
 	
-	private void doNotUse(){
-		String[] s;
-		switch ((int)(Math.random()*4)) {
-		case 0:
-			s = new String[]{
-				"*GPS*P200_L333"	
-			};
-			break;
-		case 1:
-			s = new String[]{
-				"*Local*ET31_Q22_Q33_Q34_E23_T21_R10",
-				"*SubLocal*ETE_R45_E22"
-			};
-			break;
-		case 2:
-			s = new String[]{
-				"#*Ello:31"
-			};
-			break;
-
-		default:
-			s = new String[]{
-					"**GPS**Lat33.43.5422",
-					"**GPS**Lon156.41.8434",
-					"**GPS**hight322"
-				};
-			break;
+	public void processCOI(String st){
+		String[] s = st.split("_");
+		if(s == null){
+			Debug.println("* ERROR Processing String: CommMenu: St is null!", Debug.ERROR);
+			return;
 		}
-		setUpLink(s);
+		if(s.length<2){
+			Debug.println("* ERROR Processing String: CommMenu: to Short! "+st, Debug.ERROR);
+			return;
+		}
+		if(s[0].compareTo("COI")!=0){
+			Debug.println("* ERROR Processing String: CommMenu: Wrong input (COI)! "+st, Debug.WARN);
+			return;
+		}
+		connInfo = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+		Graphics g = connInfo.getGraphics();
+		g.setFont(text);
+		
+		try {
+			paintCommInfo(g, s[1], s[2],s[3],s[4], 200, 20, true);
+			paintCommInfo(g, s[5], s[6],s[7],s[8], 0, 20, true);
+			int i = 0;
+			for (int j = 9; j < s.length; j+=4) {
+				paintCommInfo(g, s[j], s[j+1],s[j+2],s[j+3], 50, 50+i*35, true);
+				i++;
+			}
+			
+		} catch (ArrayIndexOutOfBoundsException e) {
+			Debug.println("* ERROR Processing String: CommMenu: Array shorter than usual! "+st, Debug.WARN);
+			return;
+		} catch (NullPointerException e) {
+			Debug.println("* ERROR Processing String: CommMenu: Can't process (null)! "+st, Debug.WARN);
+			return;
+		}
+	}
+	
+	private void paintCommInfo(Graphics g, String s1, String s2, String s3, String s4, int x, int y, boolean adv){
+		if(s4.compareToIgnoreCase("X")==0){
+			g.setColor(MapView.disabledColor);
+		}else{
+			g.setColor(Color.green);
+		}
+		if(s3.contains("NOT")){
+			g.setColor(Color.red);
+		}
+		g.drawString(s1, x+10, 10+y);
+		g.drawString(s2, x+10, 25+y);
+		g.drawString(s3, x+70, 25+y);
+		if(adv){
+			if(s4.compareToIgnoreCase("X")==0){
+				g.drawString("OFFLINE", x+100, 10+y);
+			}else{
+				g.drawString("ONLINE", x+100, 10+y);
+			}
+		}
 	}
 }

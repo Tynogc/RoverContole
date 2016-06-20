@@ -86,20 +86,23 @@ public class Electric extends AbstractMenu{
 				debug.Debug.println("* Error ElectricGUI01: "+e.toString());
 			}
 		}
+		if(ProcessControl.pow.wasUpdatedC){
+			ProcessControl.pow.wasUpdatedC = false;
+			
+		}
 	}
 	
 	private void upD() throws ArrayIndexOutOfBoundsException{
 		PowerSystem p = ProcessControl.pow;
 		
 		Graphics g = acc[0].getGraphics();
-		paintChargeBarSmall(0,0, p.akku1[1], g);
-		paintChargeBarSmall(0,26, p.akku1[2], g);
-		paintChargeBarSmall(0,52, p.akku1[3], g);
+		for (int i = 0; i < PowerSystem.ak1Size; i++) {
+			paintChargeBarSmall(0,26*i, p.akku1[i+1], g);
+		}
 		g = acc[1].getGraphics();
-		paintChargeBarSmall(0,0, p.akku2[1], g);
-		paintChargeBarSmall(0,26, p.akku2[2], g);
-		paintChargeBarSmall(0,52, p.akku2[3], g);
-		paintChargeBarSmall(0,78, p.akku2[4], g);
+		for (int i = 0; i < PowerSystem.ak2Size; i++) {
+			paintChargeBarSmall(0,26*i, p.akku2[i+1], g);
+		}
 	}
 
 	@Override
@@ -107,6 +110,9 @@ public class Electric extends AbstractMenu{
 		paintChargeBar(40, 100, ProcessControl.pow.akku1[0], g, ProcessControl.pow.akku1.length-1);
 		//paintChargeBar(40, 160, 440-((int)(System.currentTimeMillis()/100)%200), g, 1);
 		g.drawImage(acc[0], 40, 134, null);
+		
+		paintChargeBar(40, 300, ProcessControl.pow.akku2[0], g, ProcessControl.pow.akku1.length-1);
+		g.drawImage(acc[1], 40, 334, null);
 	}
 	
 	

@@ -233,6 +233,25 @@ public class MainFrame extends Panel{
 		PerformanceMenu.markTime(PerformanceMenu.PaintBack);
 	}
 	
+	public void saveLoop(){
+		debug.Debug.panel.setVisible(true);
+		
+		Graphics g = buffers[bufferInUse].getGraphics();
+		g.setColor(Color.black);
+		g.fillRect(0,0, sizeX, sizeY);
+		
+		gui.paint(g);
+		
+		g.setColor(Color.red);
+		g.setFont(menu.Button.plainFont);
+		g.drawString("ERROR MODE", 1300, 14);
+		buffer = buffers[bufferInUse];
+		bufferInUse++;
+		if(bufferInUse>= buffers.length)bufferInUse = 0;
+		paint(getGraphics());
+		PerformanceMenu.markTime(PerformanceMenu.PaintBack);
+	}
+	
 	public void paint(Graphics g){
 		if(buffer != null && g != null){
 			g.drawImage(buffer.getSubimage(offX, offY, frameX, frameY), 0, 0, null);

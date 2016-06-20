@@ -197,3 +197,13 @@ res/win/sub/font4.png
 res/win/sub/font4.png
 res/win/sub/ele/PG.png
 res/win/sub/ele/PG.png
+res/win/gui/spb/RESETn.png
+res/win/gui/spb/RESETc.png
+res/win/gui/spb/RESETf.png
+res/win/gui/spb/RESETd.png
+res/win/gui/spb/RESETd.png
+res/win/gui/spb/SSKINTn.png
+res/win/gui/spb/SSKINTc.png
+res/win/gui/spb/SSKINTf.png
+res/win/gui/spb/SSKINTd.png
+res/win/gui/spb/SSKINTd.png

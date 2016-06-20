@@ -11,6 +11,7 @@ public class PowerSystem {
 	public static final int DISABLED = -1;
 
 	public boolean wasUpdated = false;
+	public boolean wasUpdatedC = false;
 	private boolean updIntern = false;
 	
 	public int[] akku1;
@@ -18,20 +19,35 @@ public class PowerSystem {
 	public int[] akku3;
 	
 	//Cellcount
-	public static final int ak1Size = 3;
+	public static final int ak1Size = 4;
 	public static final int ak2Size = 4;
 	public static final int ak3Size = 4;
+	
+	public static int volt1;
+	public static int volt2;
+	public static int voltBar1;
+	public static int voltBar2;
+	
+	public static byte[] switches;
 	
 	public PowerSystem(){
 		akku1 = new int[ak1Size+1];
 		akku2 = new int[ak2Size+1];
 		akku3 = new int[ak3Size+1];
 		
+		volt1 = DISABLED;
+		volt2 = DISABLED;
+		
+		switches = new byte[40];
+		
 		for (int i = 0; i < akku1.length; i++) {
 			akku1[i] = DISABLED;
 		}
 		for (int i = 0; i < akku2.length; i++) {
 			akku2[i] = DISABLED;
+		}
+		for (int i = 0; i < switches.length; i++) {
+			switches[i] = 0;
 		}
 	}
 	
@@ -42,7 +58,7 @@ public class PowerSystem {
 			return;
 		}
 		if(st[0].compareTo("BAT")!=0){
-			debug.Debug.println("* Problem handling Input: PowerSystem: Wrong string! "+s, debug.Debug.WARN);
+			debug.Debug.println("* Problem handling Input: PowerSystem: Wrong string! "+s, debug.Debug.ERROR);
 			return;
 		}
 		if(st[1].compareTo("M1")==0){
@@ -54,6 +70,42 @@ public class PowerSystem {
 		}else{
 			debug.Debug.println("* Problem handling Input: PowerSystem: Could not resolve! "+s, debug.Debug.WARN);
 			return;
+		}
+	}
+	
+	public void processStringESV(String s){
+		wasUpdatedC = true;
+		String[] st = s.split("_");
+		if(st.length<=1){
+			debug.Debug.println("* Problem handling Input: PowerSystem: String not alined! "+s, debug.Debug.WARN);
+			return;
+		}
+		if(st[0].compareTo("ESV")!=0){
+			debug.Debug.println("* Problem handling Input: PowerSystem: Wrong string! "+s, debug.Debug.ERROR);
+			return;
+		}
+		for (int i = 1; i < st.length-1; i+=2) {
+			byte a;
+			if(st[i+1].compareToIgnoreCase("X")==0) a = 0;
+			else if(st[i+1].compareToIgnoreCase("Y")==0) a = 1;
+			else if(st[i+1].compareToIgnoreCase("N")==0) a = 2;
+			else if(st[i+1].compareToIgnoreCase("W")==0) a = 3;
+			else{
+				debug.Debug.println("* Problem handling Input: PowerSystem: Wrong Tag! "+s, debug.Debug.WARN);
+				continue;
+			}
+			int d = 0;
+			try {
+				d = Integer.parseInt(st[i]);
+			} catch (IllegalArgumentException e) {
+				debug.Debug.println("* Problem handling Input: PowerSystem: Can't convert to int! "+s, debug.Debug.WARN);
+				continue;
+			}
+			if(d<0 || d>=switches.length){
+				debug.Debug.println("* Problem handling Input: PowerSystem: Switch dosn't exixt! "+s, debug.Debug.ERROR);
+				continue;
+			}
+			switches[d] = a;
 		}
 	}
 	
@@ -80,6 +132,19 @@ public class PowerSystem {
 	public void check(){
 		if(updIntern){
 			updIntern = false;
+			
+			volt1 = akku1[0];
+			volt2 = akku2[0];
+			
+			double d = (double)(akku1[0]-VOLTS_WARN*ak1Size)/((MAX_VOLTS-VOLTS_WARN)*ak1Size);
+			voltBar1 = (int)(d*4)+1;
+			d = (double)(akku2[0]-VOLTS_WARN*ak2Size)/((MAX_VOLTS-VOLTS_WARN)*ak2Size);
+			voltBar2 = (int)(d*4)+1;
+			if(volt1 > DISABLED && voltBar1 <0)voltBar1 = 0;
+			if(volt2 > DISABLED && voltBar2 <0)voltBar2 = 0;
+			if(voltBar1>3)voltBar1 = 3;
+			if(voltBar2>3)voltBar2 = 3;
+			
 			String warn = null;
 			String alarm = null;
 			for (int i = 1; i < akku2.length; i++) {

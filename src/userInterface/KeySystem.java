@@ -21,6 +21,12 @@ public class KeySystem implements java.awt.event.KeyListener{
 				}
 			}
 		}
+		if(arg0.isControlDown()){
+			int f = arg0.getKeyCode();
+			if(f>=49 && f<=57 && fMenus!=null){
+				fMenus.fKeyPressed(arg0.getKeyCode()-48);
+			}
+		}
 	}
 
 	@Override
