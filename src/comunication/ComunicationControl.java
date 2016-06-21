@@ -186,7 +186,15 @@ public class ComunicationControl {
 			comMenu.setUpLink(s);
 		}
 		for (int i = 0; i < s.length; i++) {
+			if(s[i]==null)
+				continue;
+			
 			linker.send(s[i]);
+			
+			if(s[i].length()>=1){
+				if(s[i].charAt(0)=='>')
+					action.securityCodePending();
+			}
 			
 			if(sendString == null){
 				sendString = new SendString(s[i], System.currentTimeMillis());

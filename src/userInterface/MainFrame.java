@@ -50,7 +50,7 @@ public class MainFrame extends Panel{
 	public static boolean hideDebugFrame = true;
 	public static boolean standartStartUp = true;
 	public static boolean fullScreen = true;
-	public static byte playIntro = 0; //0: Play, 1: Play Simple ELSE: dont play
+	public static byte playIntro = 0; //0: Play, 1: Play Simple ELSE: don't play
 	
 	private StartAnimation startAnim;
 	

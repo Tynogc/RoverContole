@@ -6,9 +6,10 @@ import process.ProcessControl;
 public class CommAction {
 	
 	private int currentLog;
+	private boolean secureComPending;
 	
 	public CommAction(){
-		
+		secureComPending = false;
 	}
 	
 	public void processString(String s){
@@ -21,6 +22,8 @@ public class CommAction {
 			//TODO process Error
 		}else if(s.charAt(0)=='/'){
 			log(s.substring(1));
+		}else if(s.charAt(0)=='>'){
+			sendFP(s.substring(1));
 		}
 	}
 	
@@ -55,5 +58,27 @@ public class CommAction {
 		}
 		SettingsMenu.set.addText(s, currentLog);
 	}
+	
+	private void sendFP(String s){
+		if(secureComPending){
+			int i = 0;
+			try {
+				i = Integer.parseInt(s);
+			} catch (Exception e) {
+				debug.Debug.println("* ERROR CommAction07: cant Convert to int:"+s, debug.Debug.ERROR);
+				return;
+			}
+			
+			FingerPrint f = new FingerPrint();
+			debug.Debug.println("* A Security Key is Requested: Sending...!", debug.Debug.TEXT);
+			ComunicationControl.com.send("<"+f.getFingerprintAt(i));
+			secureComPending = false;
+		}else{
+			debug.Debug.println("* A Security Key is Requested, however no Key should be sent!", debug.Debug.ERROR);
+		}
+	}
 
+	public void securityCodePending(){
+		secureComPending = true;
+	}
 }

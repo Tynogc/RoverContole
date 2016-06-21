@@ -15,6 +15,7 @@ public class ShutdownMenu extends AbstractMenu{
 	private Button shut;
 	private Button cancel;
 	private Button advLog;
+	private Button restart;
 	
 	private final int x;
 	private final int y;
@@ -36,7 +37,18 @@ public class ShutdownMenu extends AbstractMenu{
 			protected void isFocused() {}
 			@Override
 			protected void isClicked() {
-				System.exit(0);
+				stopSys();
+			}
+		};
+		restart = new Button(x+105,y-16,"res/win/gui/cli/001") {
+			@Override
+			protected void uppdate() {}
+			@Override
+			protected void isFocused() {}
+			@Override
+			protected void isClicked() {
+				userInterface.ExitThread.restart = true;
+				stopSys();
 			}
 		};
 		cancel = new Button(x-55,y+20,"res/win/gui/cli/Gsk") {
@@ -65,6 +77,7 @@ public class ShutdownMenu extends AbstractMenu{
 		add(advLog);
 		add(cancel);
 		add(shut);
+		add(restart);
 		
 		timeToShutdown  =System.currentTimeMillis()+30000;
 	}
@@ -98,6 +111,11 @@ public class ShutdownMenu extends AbstractMenu{
 	
 	public boolean stillActiv(){
 		return stillActiv;
+	}
+	
+	private void stopSys(){
+		//TODO handle stop
+		System.exit(0);
 	}
 
 }

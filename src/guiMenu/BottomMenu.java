@@ -250,7 +250,7 @@ public class BottomMenu extends menu.AbstractMenu{
 		if(run.isVisible()){
 			run.setVisible(false);
 			stop.setVisible(true);
-			ComunicationControl.com.send("*RUN");
+			ComunicationControl.com.send(">RUN");
 		}else{
 			ComunicationControl.com.send("*STOP");
 			run.setVisible(true);
