@@ -1,12 +1,16 @@
 package userInterface;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 
 public class ExitThread extends Thread{
 	
 	private static String filePath;
+	
+	public static boolean restart = false;
 	
 	public static void setFilePath(String s){
 		filePath = s;
@@ -95,6 +99,20 @@ public class ExitThread extends Thread{
 				writer.flush(); 
 				writer.close(); 
 			} 
+		}
+		if(restart){
+			StringBuilder cmd = new StringBuilder();
+			cmd.append(System.getProperty("java.home")+File.separator+"bin"+File.separator+"java ");
+			for(String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()){
+				cmd.append(jvmArg+" ");
+			}
+			cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+			cmd.append(MainFrame.class.getName()).append(" ");
+			try {
+				Runtime.getRuntime().exec(cmd.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

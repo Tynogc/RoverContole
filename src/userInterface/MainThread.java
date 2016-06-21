@@ -37,6 +37,7 @@ public class MainThread extends Thread{
 				debug.Debug.println("* FATAL: Uncatched Error!", debug.Debug.FATAL);
 				debug.Debug.printExeption(e);
 				isRunning = false;
+				ExitThread.restart = true;
 			}
 			
 			//FPS uberprufen
@@ -66,7 +67,7 @@ public class MainThread extends Thread{
 			}
 		}
 		isRunning = true;
-		sleepTime = 15;
+		sleepTime = 10;
 		debug.Debug.println("* Restoring to save Mode", debug.Debug.FATAL);
 		while (isRunning) {
 			frame.saveLoop();
